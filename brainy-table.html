@@ -1,0 +1,458 @@
+<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../iron-resizable-behavior/iron-resizable-behavior.html">
+
+<link rel="import" href="brainy-table-column.html">
+<link rel="import" href="brainy-table-column-sort.html">
+<link rel="import" href="brainy-td.html">
+<link rel="import" href="brainy-tr.html">
+<link rel="import" href="brainy-tr-detail.html">
+
+<dom-module id="brainy-table">
+  <template>
+    <style>
+      :host {
+        display: block;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+
+        @apply(--brainy-table);
+      }
+
+      brainy-table-column-sort + * {
+        position: relative;
+        left: -24px;
+      }
+    </style>
+
+    <div id="header">
+      <brainy-tr header>
+        <template is="dom-repeat" items="[[columns]]" as="column">
+          <brainy-td
+            header
+            align-right="[[column.alignRight]]"
+            before-bind="[[beforeCellBind]]"
+            column="[[column]]"
+            flex="[[column.flex]]"
+            hidden="[[column.hidden]]"
+            order="[[column.order]]"
+            table="[[_this]]"
+            template="[[column.headerTemplate]]"
+            width="[[column.width]]"
+          >
+            <brainy-table-column-sort
+              sort-order="[[sortOrder]]"
+              path="[[column.sortBy]]"
+              on-sort-direction-changed="_sortDirectionChanged"
+              hidden$="[[!column.sortBy]]"
+            ></brainy-table-column-sort>
+          </brainy-td>
+        </template>
+      </brainy-tr>
+    </div>
+
+    <template id="rows" is="dom-repeat" items="{{items}}" sort="[[_computeSort(sortOrder.*)]]" filter="[[_computeFilter(filter.*)]]">
+      <div class="item">
+        <brainy-tr
+          before-bind="[[beforeRowBind]]"
+          even$="[[!_isEven(index)]]"
+          expanded="[[_isExpanded(item, expandedItems, expandedItems.*)]]"
+          index="[[index]]"
+          item="[[item]]"
+          tabindex="-1"
+        >
+          <template is="dom-repeat" items="[[columns]]" as="column" index-as="colIndex">
+            <brainy-td
+              template="[[column.template]]"
+              table="[[_this]]"
+              align-right="[[column.alignRight]]"
+              column="[[column]]"
+              expanded="[[_isExpanded(item, expandedItems, expandedItems.*)]]"
+              flex="[[column.flex]]"
+              hidden="[[column.hidden]]"
+              index="[[index]]"
+              item="[[item]]"
+              on-click="_onCellClick"
+              order="[[column.order]]"
+              width="[[column.width]]"
+              before-bind="[[beforeCellBind]]"
+            ></brainy-td>
+          </template>
+          <template is="dom-if" if="[[_isExpanded(item, expandedItems)]]">
+            <brainy-tr-detail
+              index="[[index]]"
+              item="[[item]]"
+              expanded="[[_isExpanded(item, expandedItems, expandedItems.*)]]"
+              before-bind="[[beforeDetailsBind]]"
+              table="[[_this]]"
+              template="[[_rowDetail]]"
+            ></brainy-tr-detail>
+          </template>
+        </brainy-tr>
+      </div>
+    </template>
+
+    <content select="brainy-table-column"></content>
+    <content select="template[is=row-detail]"></content>
+  </template>
+
+  <script>
+    (function() {
+      'use strict';
+
+      Polymer({
+        is: 'brainy-table',
+
+        behaviors: [
+          Polymer.IronResizableBehavior
+        ],
+
+        properties: {
+
+          /**
+           * A function that is called before data is bound to a row or header cell.
+           * Can be used to customize the cell element depending on the data.
+           * #### Example:
+           * ```js
+           * function(data, cell) {
+           *   cell.toggleClass('custom', data.useCustomClass);
+           * }
+           * ```
+           */
+          beforeCellBind: Object,
+
+          /**
+           * A function that is called before data is bound to a row details element.
+           * Can be used to customize the element depending on the data.
+           * #### Example:
+           * ```js
+           * function(data, details) {
+           *   details.toggleClass('custom', data.useCustomClass);
+           * }
+           * ```
+           */
+          beforeDetailsBind: Object,
+
+          /**
+           * A function that is called before data is bound to a row.
+           * Can be used to customize the row element depending on the data.
+           * #### Example:
+           * ```js
+           * function(data, row) {
+           *   row.toggleClass('custom', data.useCustomClass);
+           * }
+           * ```
+           */
+          beforeRowBind: Object,
+
+          /**
+           * An array containing the items which will be stamped to the column template
+           * instances.
+           */
+          items: {
+            type: Array
+          },
+
+          /**
+           * If `true`, tapping a row will expand the item details, if available.
+           */
+          detailsEnabled: {
+            type: Boolean,
+            value: false
+          },
+
+          /**
+           * An array containing path/filter value pairs that are used to filter the items
+           */
+          filter: {
+            type: Array,
+            notify: true,
+            value: function() {
+              return [];
+            }
+          },
+
+          /**
+           * An array with a path/sortorder ('asc' or 'desc') pairs that are used to sort the items.
+           */
+          sortOrder: {
+            type: Array,
+            value: function() {
+              return [];
+            }
+          },
+
+          /**
+           * An array of `brainy-table-column` elements which contain the templates
+           * to be stamped with items.
+           */
+          columns: {
+            type: Array,
+            notify: true,
+            observer: '_columnsChanged',
+            value: function() {
+              return [];
+            }
+          },
+
+          expandedItems: {
+            type: Array,
+            value: function() {
+              return [];
+            }
+          },
+
+          _rowDetail: Object,
+
+          _this: {
+            type: Object,
+            value: function() {
+              return this;
+            }
+          }
+        },
+
+        listeners: {
+          'column-filter-changed': '_onColumnFilterChanged',
+          'item-changed': '_itemChanged'
+        },
+
+        observers: [
+          '_renderOnChange(items.*)'
+        ],
+
+        created: function() {
+          this._observer = Polymer.dom(this).observeNodes(function(info) {
+            var hasColumns = function(node) {
+              return (node.nodeType === Node.ELEMENT_NODE && node.tagName.toUpperCase() === 'BRAINY-TABLE-COLUMN');
+            };
+
+            var hasDetails = function(node) {
+              return (node.nodeType === Node.ELEMENT_NODE &&
+                node.tagName.toUpperCase() === 'TEMPLATE' && node.hasAttribute('is') &&
+                node.getAttribute('is') === 'row-detail');
+            };
+
+            if (info.addedNodes.filter(hasColumns).length > 0 ||
+              info.removedNodes.filter(hasColumns).length > 0) {
+              this.set('columns', this.getContentChildren('[select=brainy-table-column]'));
+              this.notifyResize();
+            }
+
+            if (info.addedNodes.filter(hasDetails).length > 0) {
+              this.set('_rowDetail', this.getContentChildren('[select="template[is=row-detail]"]')[0]);
+
+              // assuming parent element is always a Polymer element.
+              // set dataHost to the same context the template was declared in
+              var parent = Polymer.dom(this._rowDetail).parentNode;
+              this._rowDetail._rootDataHost = parent.dataHost ?
+                (parent.dataHost._rootDataHost || parent.dataHost) : parent;
+            }
+
+          }.bind(this));
+        },
+
+        _stopPropagation: function(e) {
+          e.stopImmediatePropagation();
+        },
+
+        _isEven: function(index) {
+          return index % 2 === 0;
+        },
+
+        _sortDirectionChanged: function(e) {
+          for (var i = 0; i < this.sortOrder.length; i++) {
+            if (this.sortOrder[i].path === e.detail.path) {
+              if (e.detail.direction) {
+                this.set('sortOrder.' + i + '.direction', e.detail.direction);
+              } else {
+                this.splice('sortOrder', i, 1);
+              }
+              return;
+            }
+          }
+
+          this.push('sortOrder', {
+            path: e.detail.path,
+            direction: e.detail.direction
+          });
+        },
+
+        _computeSort: function (change) {
+          var _compare = function(a, b) {
+            if (a < b) {
+              return -1;
+            }
+            if (a > b) {
+              return 1;
+            }
+            return 0;
+          };
+
+          return function(a, b) {
+            return change.base.map(function(sort) {
+              if (sort.direction === 'asc') {
+                return _compare(Polymer.Base.get(sort.path, a), Polymer.Base.get(sort.path, b));
+              } else if (sort.direction === 'desc') {
+                return _compare(Polymer.Base.get(sort.path, b), Polymer.Base.get(sort.path, a));
+              }
+              return 0;
+            }).reduce(function firstNonZeroValue(p, n) {
+              return p ? p : n;
+            }, 0);
+          };
+        },
+
+        _computeFilter: function (change) {
+          var filter = change.base;
+          var result = null;
+          if (filter.length) {
+            result = function (item) {
+              for (var i = 0; i < filter.length; i++) {
+                var value = Polymer.Base.get(filter[i].path, item);
+                if (!filter[i].filter) {
+                  continue;
+                } else if (!value || value.toString().toLowerCase().indexOf(filter[i].filter.toString().toLowerCase()) === -1) {
+                  return false;
+                }
+              }
+              return true;
+            };
+          }
+          return result;
+        },
+
+        _columnsChanged: function(columns, oldColumns) {
+          if (oldColumns) {
+            oldColumns.forEach(function(column) {
+              this.unlisten(column, 'filter-value-changed');
+            }.bind(this));
+          }
+
+          if (columns) {
+            columns.forEach(function(column) {
+              column.table = this;
+              this.listen(column, 'filter-value-changed', '_onColumnFilterChanged');
+            }.bind(this));
+          }
+        },
+
+        _onColumnFilterChanged: function(e) {
+          for (var i = 0; i < this.filter.length; i++) {
+            if (this.filter[i].path === e.detail.filterBy) {
+              this.set('filter.' + i + '.filter', e.detail.value);
+              return;
+            }
+          }
+
+          this.push('filter', {
+            path: e.detail.filterBy,
+            filter: e.detail.value
+          });
+        },
+
+        _itemChanged: function(e) {
+          if (this.items) {
+            var index = this.items.indexOf(e.detail.item);
+            if (index >= 0) {
+              this.set('items.' + index + '.' + e.detail.path, e.detail.value);
+            }
+          }
+        },
+
+        _renderOnChange: function () {
+            this.debounce('render', this.render);
+        },
+
+        /**
+         * Expands the row details for this item, if available.
+         */
+        expandItem: function(item) {
+          if (this._rowDetail && this.expandedItems && !this._isExpanded(item, this.expandedItems)) {
+
+            // replacing the whole array here to simplify the observers.
+            this.expandedItems.push(item);
+            this.expandedItems = this.expandedItems.slice(0);
+          }
+        },
+
+        /**
+         * Collapses the row details for this item, if expanded.
+         */
+        collapseItem: function(item) {
+          if (this._rowDetail && this.expandedItems && this._isExpanded(item, this.expandedItems)) {
+            var index = this.expandedItems.indexOf(item);
+
+            // replacing the whole array here to simplify the obsevers.
+            this.expandedItems.splice(index, 1);
+            this.expandedItems = this.expandedItems.slice(0);
+          }
+        },
+
+        /**
+         * Forces table to render rows synchronously.
+         */
+        render: function() {
+          this.$.rows.render();
+        },
+
+        _isExpanded: function(item, items) {
+          return items && items.indexOf(item) > -1;
+        },
+
+        _isFocusable: function(target) {
+          if (Polymer.Settings.useNativeShadow) {
+            // https://nemisj.com/focusable/
+            // tabIndex is not reliable in IE.
+            return target.tabIndex >= 0;
+          } else {
+            // unreliable with Shadow, document.activeElement doesn't go inside
+            // the shadow root.
+            return target.contains(Polymer.dom(document.activeElement).node) || target.tagName.toUpperCase() === 'A';
+          }
+        },
+
+        /**
+         * Fired when user clicks on a item to expand it.
+         *
+         * @event expanding-item
+         * @param {Object} detail
+         * @param {Object} detail.item item to be expanded
+         */
+
+         /**
+          * Fired when user clicks on a item to collapse it.
+          *
+          * @event collapsing-item
+          * @param {Object} detail
+          * @param {Object} detail.item item to be collapsed
+          */
+
+        // we need to listen to click instead of tap because on mobile safari, the
+        // document.activeElement has not been updated (focus has not been shifted)
+        // yet at the point when tap event is being executed.
+        _onCellClick: function(e) {
+          // Prevent row expanding if row itself is not focused. This means that an element inside the row has been focused.
+          // Mobile devices don't move focus from body unless it's an input element that is focused, so this element will never get focused.
+          if (this._isFocusable(Polymer.dom(e).localTarget)) {
+            return;
+          } else {
+            var fireEvent = function(eventName, item, defaultAction) {
+              var e = this.fire(eventName, {item: item}, {cancelable: true});
+              if (!e.defaultPrevented) {
+                defaultAction.call(this, item);
+              }
+            }.bind(this);
+
+            if (this._rowDetail && this.detailsEnabled) {
+              if (this._isExpanded(e.model.item, this.expandedItems)) {
+                fireEvent('collapsing-item', e.model.item, this.collapseItem);
+              } else {
+                fireEvent('expanding-item', e.model.item, this.expandItem);
+              }
+            }
+          }
+        }
+      });
+    })();
+  </script>
+</dom-module>

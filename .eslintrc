@@ -1,0 +1,21 @@
+{
+  "extends": "google",
+  "plugins": [ "html" ],
+  "rules":  {
+    "new-cap": ["error", {"capIsNewExceptions": ["Polymer"]}],
+    "linebreak-style": "off"
+  },
+  "env": {
+    "browser": true,
+    "mocha": true
+  },
+  "globals": {
+    "Polymer": true,
+    "Brainy": true,
+    "WCT": true,
+    "expect": true,
+    "fixture": true,
+    "flush": true,
+    "sinon": true
+  }
+}

@@ -1,0 +1,110 @@
+<dom-module id="brainy-tr">
+  <template>
+    <style>
+      :host {
+        display: flex;
+        flex-direction: column;
+
+        @apply(--brainy-tr);
+      }
+
+      :host([header]) {
+        border: none;
+      }
+
+      :host(:not([header])[even]) {
+        @apply(--brainy-tr-even);
+      }
+
+      :host(:not([header]):not([even])) {
+        @apply(--brainy-tr-odd);
+      }
+
+      :host(:focus) {
+        outline: none;
+        @apply(--brainy-tr-focused);
+      }
+
+      :host(:not([header]):hover) {
+        @apply(--brainy-tr-hover);
+      }
+
+      :host(:focus):after {
+        @apply(--brainy-tr-focused-after);
+      }
+
+      :host:after {
+        @apply(--brainy-tr-after);
+      }
+
+      .cells {
+        display: flex;
+        flex-direction: row;
+        width: 100%;
+      }
+    </style>
+    <div class="cells">
+      <content select="brainy-td"></content>
+    </div>
+    <div class="details">
+      <content select="brainy-tr-detail"></content>
+    </div>
+  </template>
+  <script>
+    (function() {
+      'use strict';
+
+      Polymer({
+        is: 'brainy-tr',
+
+        properties: {
+          beforeBind: Object,
+          expanded: {
+            type: Boolean,
+            reflectToAttribute: true
+          },
+          index: Number,
+          item: Object,
+          _static: {
+            type: Object,
+            value: { id: 0 }
+          }
+        },
+
+        observers: [
+          '_beforeBind(beforeBind, index, item.*, expanded)'
+        ],
+
+        attached: function() {
+          if (this.domHost && this.domHost.tagName.toUpperCase() === 'BRAINY-TABLE') {
+            var id = this._static.id++;
+
+            var item = this.parentElement;
+            if (!item._rowId) {
+              this._contentElement = document.createElement('content');
+              this._contentElement.setAttribute('select', '#item' + id);
+              Polymer.dom(item).appendChild(this._contentElement);
+              this.id = 'item' + id;
+              item._rowId = id;
+
+              Polymer.dom(this.domHost).appendChild(this);
+              // reset the cached value for shady root owner to make this.domHost
+              // return correct value.
+              this._ownerShadyRoot = undefined;
+            }
+          }
+        },
+
+        _beforeBind: function(beforeBind, index, item, expanded) {
+          var data = {
+            index: index,
+            item: item.base,
+            expanded: expanded
+          };
+
+          beforeBind(data, this);
+        }
+      });
+    })();
+  </script>
+</dom-module>

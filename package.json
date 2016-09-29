@@ -1,0 +1,20 @@
+{
+  "name": "brainy-table",
+  "author": "Sergey Kulikov",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/web-padawan/brainy-table.git"
+  },
+  "license": "MIT",
+  "main": "index.html",
+  "dependencies": {
+    "bower": "^1.7.7"
+  },
+  "devDependencies": {
+    "web-component-tester": "^4.2.0"
+  },
+  "scripts": {
+    "test": "node_modules/web-component-tester/bin/wct",
+    "install": "node_modules/bower/bin/bower install --allow-root"
+  }
+}

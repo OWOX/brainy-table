@@ -1,0 +1,55 @@
+<dom-module id="brainy-tr-detail">
+  <template>
+    <style>
+      :host {
+        padding: 0 24px;
+        display: flex;
+        align-items: center;
+
+        @apply(--brainy-tr-detail);
+      }
+    </style>
+    <content></content>
+  </template>
+  <script>
+    (function() {
+      'use strict';
+
+      Polymer({
+        is: 'brainy-tr-detail',
+
+        behaviors: [
+          Brainy.TableTemplatizerBehavior
+        ],
+
+        properties: {
+          beforeBind: Object
+        },
+
+        observers: [
+          '_beforeBind(beforeBind, item.*, index, expanded)'
+        ],
+
+        attached: function() {
+          if (!Polymer.Settings.useNativeShadow) {
+            // details is supposed to be placed outside the local dom of iron-data-table.
+            Polymer.StyleTransformer.dom(this, 'brainy-table', this._scopeCssViaAttr, true);
+            if (this.domHost) {
+              Polymer.StyleTransformer.dom(this, this.domHost.tagName.toLowerCase(), this._scopeCssViaAttr, false);
+            }
+          }
+        },
+
+        _beforeBind: function(beforeBind, item, index, expanded) {
+          var data = {
+            index: index,
+            item: item.base,
+            expanded: expanded
+          };
+
+          beforeBind(data, this);
+        }
+      });
+    })();
+  </script>
+</dom-module>
