@@ -50,46 +50,48 @@
       </brainy-tr>
     </div>
 
-    <template id="rows" is="dom-repeat" items="{{items}}" sort="[[_computeSort(sortOrder.*)]]" filter="[[_computeFilter(filter.*)]]">
-      <div class="item">
-        <brainy-tr
-          before-bind="[[beforeRowBind]]"
-          even$="[[!_isEven(index)]]"
-          expanded="[[_isExpanded(item, expandedItems, expandedItems.*)]]"
-          index="[[index]]"
-          item="[[item]]"
-          tabindex="-1"
-        >
-          <template is="dom-repeat" items="[[columns]]" as="column" index-as="colIndex">
-            <brainy-td
-              template="[[column.template]]"
-              table="[[_this]]"
-              align-right="[[column.alignRight]]"
-              column="[[column]]"
-              expanded="[[_isExpanded(item, expandedItems, expandedItems.*)]]"
-              flex="[[column.flex]]"
-              hidden="[[column.hidden]]"
-              index="[[index]]"
-              item="[[item]]"
-              on-click="_onCellClick"
-              order="[[column.order]]"
-              width="[[column.width]]"
-              before-bind="[[beforeCellBind]]"
-            ></brainy-td>
-          </template>
-          <template is="dom-if" if="[[_isExpanded(item, expandedItems)]]">
-            <brainy-tr-detail
-              index="[[index]]"
-              item="[[item]]"
-              expanded="[[_isExpanded(item, expandedItems, expandedItems.*)]]"
-              before-bind="[[beforeDetailsBind]]"
-              table="[[_this]]"
-              template="[[_rowDetail]]"
-            ></brainy-tr-detail>
-          </template>
-        </brainy-tr>
-      </div>
-    </template>
+    <div id="container">
+      <template id="rows" is="dom-repeat" items="{{items}}" sort="[[_computeSort(sortOrder.*)]]" filter="[[_computeFilter(filter.*)]]">
+        <div class="item">
+          <brainy-tr
+            before-bind="[[beforeRowBind]]"
+            even$="[[!_isEven(index)]]"
+            expanded="[[_isExpanded(item, expandedItems, expandedItems.*)]]"
+            index="[[index]]"
+            item="[[item]]"
+            tabindex="-1"
+          >
+            <template is="dom-repeat" items="[[columns]]" as="column" index-as="colIndex">
+              <brainy-td
+                template="[[column.template]]"
+                table="[[_this]]"
+                align-right="[[column.alignRight]]"
+                column="[[column]]"
+                expanded="[[_isExpanded(item, expandedItems, expandedItems.*)]]"
+                flex="[[column.flex]]"
+                hidden="[[column.hidden]]"
+                index="[[index]]"
+                item="[[item]]"
+                on-click="_onCellClick"
+                order="[[column.order]]"
+                width="[[column.width]]"
+                before-bind="[[beforeCellBind]]"
+              ></brainy-td>
+            </template>
+            <template is="dom-if" if="[[_isExpanded(item, expandedItems)]]">
+              <brainy-tr-detail
+                index="[[index]]"
+                item="[[item]]"
+                expanded="[[_isExpanded(item, expandedItems, expandedItems.*)]]"
+                before-bind="[[beforeDetailsBind]]"
+                table="[[_this]]"
+                template="[[_rowDetail]]"
+              ></brainy-tr-detail>
+            </template>
+          </brainy-tr>
+        </div>
+      </template>
+    </div>
 
     <content select="brainy-table-column"></content>
     <content select="template[is=row-detail]"></content>
@@ -213,7 +215,9 @@
 
         listeners: {
           'column-filter-changed': '_onColumnFilterChanged',
-          'item-changed': '_itemChanged'
+          'item-changed': '_itemChanged',
+          'iron-resize': '_resizeCellContainers',
+          'scroll': '_onHorizontalScroll'
         },
 
         observers: [
@@ -257,6 +261,25 @@
 
         _isEven: function(index) {
           return index % 2 === 0;
+        },
+
+        _resizeCellContainers: function() {
+          // reset header width first to make the cells and scroll width to reset their widths.
+          this.$.container.style.width = '';
+
+          this.async(function() {
+            this.$.container.style.width = Math.min(this.scrollWidth, this.clientWidth + this.scrollLeft) + 'px';
+          }.bind(this));
+        },
+
+        _onHorizontalScroll: function() {
+          if (!this.isDebouncerActive('scrolling')) {
+            this.$.container.style.width = this.scrollWidth + 'px';
+            this.debounce('scrolling', function() {
+              this.$.container.style.width = Math.min(this.scrollWidth, this.clientWidth + this.scrollLeft) + 'px';
+              // long timeout here to prevent jerkiness with the rubberband effect on iOS especially.
+            }, 1000);
+          }
         },
 
         _sortDirectionChanged: function(e) {
@@ -359,10 +382,6 @@
           }
         },
 
-        _renderOnChange: function () {
-            this.debounce('render', this.render);
-        },
-
         /**
          * Expands the row details for this item, if available.
          */
@@ -419,13 +438,13 @@
          * @param {Object} detail.item item to be expanded
          */
 
-         /**
-          * Fired when user clicks on a item to collapse it.
-          *
-          * @event collapsing-item
-          * @param {Object} detail
-          * @param {Object} detail.item item to be collapsed
-          */
+        /**
+         * Fired when user clicks on a item to collapse it.
+         *
+         * @event collapsing-item
+         * @param {Object} detail
+         * @param {Object} detail.item item to be collapsed
+         */
 
         // we need to listen to click instead of tap because on mobile safari, the
         // document.activeElement has not been updated (focus has not been shifted)
