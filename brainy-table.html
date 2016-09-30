@@ -211,7 +211,7 @@
         listeners: {
           'column-filter-changed': '_onColumnFilterChanged',
           'item-changed': '_itemChanged',
-          'iron-resize': '_resizeCellContainers',
+          'iron-resize': '_onResize',
           'scroll': '_onHorizontalScroll'
         },
 
@@ -258,27 +258,26 @@
           return index % 2 === 0;
         },
 
-        _resizeCellContainers: function() {
-          // reset header width first to make the cells and scroll width to reset their widths.
+        _resizeCellContainers: function () {
+          var width = Math.min(this.scrollWidth, this.clientWidth + this.scrollLeft) + 'px';
+          this.$.container.style.width = width;
+          this.$.header.style.width = width;
+        },
+
+        _onResize: function() {
+          // reset width first to make the cells and scroll width to reset their widths.
           this.$.container.style.width = '';
           this.$.header.style.width = '';
-
-          this.async(function() {
-            var width = Math.min(this.scrollWidth, this.clientWidth + this.scrollLeft) + 'px';
-            this.$.container.style.width = width;
-            this.$.header.style.width = width;
-          }.bind(this));
+          this.async(this._resizeCellContainers);
         },
 
         _onHorizontalScroll: function() {
           if (!this.isDebouncerActive('scrolling')) {
             this.$.container.style.width = this.scrollWidth + 'px';
-            this.debounce('scrolling', function() {
-              this.$.container.style.width = Math.min(this.scrollWidth, this.clientWidth + this.scrollLeft) + 'px';
-              // long timeout here to prevent jerkiness with the rubberband effect on iOS especially.
-            }, 1000);
+            this.$.header.style.width = this.scrollWidth + 'px';
+            this.debounce('scrolling', this._resizeCellContainers);
           }
-        },
+       },
 
         _sortDirectionChanged: function(e) {
           for (var i = 0; i < this.sortOrder.length; i++) {
