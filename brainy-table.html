@@ -17,6 +17,10 @@
 
         @apply(--brainy-table);
       }
+
+      :host([details-enabled]) ::content brainy-tr:not([header]):hover {
+        cursor: pointer;
+      }
     </style>
 
     <div id="header">
@@ -154,6 +158,7 @@
            */
           detailsEnabled: {
             type: Boolean,
+            reflectToAttribute: true,
             value: false
           },
 
@@ -277,7 +282,7 @@
             this.$.header.style.width = this.scrollWidth + 'px';
             this.debounce('scrolling', this._resizeCellContainers);
           }
-       },
+        },
 
         _sortDirectionChanged: function(e) {
           for (var i = 0; i < this.sortOrder.length; i++) {
