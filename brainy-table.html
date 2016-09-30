@@ -261,9 +261,12 @@
         _resizeCellContainers: function() {
           // reset header width first to make the cells and scroll width to reset their widths.
           this.$.container.style.width = '';
+          this.$.header.style.width = '';
 
           this.async(function() {
-            this.$.container.style.width = Math.min(this.scrollWidth, this.clientWidth + this.scrollLeft) + 'px';
+            var width = Math.min(this.scrollWidth, this.clientWidth + this.scrollLeft) + 'px';
+            this.$.container.style.width = width;
+            this.$.header.style.width = width;
           }.bind(this));
         },
 
