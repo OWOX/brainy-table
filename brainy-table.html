@@ -413,6 +413,7 @@
          */
         render: function() {
           this.$.rows.render();
+          this.fire('table-rendered');
         },
 
         _isExpanded: function(item, items) {
