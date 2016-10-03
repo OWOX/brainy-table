@@ -26,14 +26,6 @@
           Brainy.TableTemplatizerBehavior
         ],
 
-        properties: {
-          beforeBind: Object
-        },
-
-        observers: [
-          '_beforeBind(beforeBind, item.*, index, expanded)'
-        ],
-
         attached: function() {
           if (!Polymer.Settings.useNativeShadow) {
             // details is supposed to be placed outside the local dom of iron-data-table.
@@ -42,16 +34,6 @@
               Polymer.StyleTransformer.dom(this, this.domHost.tagName.toLowerCase(), this._scopeCssViaAttr, false);
             }
           }
-        },
-
-        _beforeBind: function(beforeBind, item, index, expanded) {
-          var data = {
-            index: index,
-            item: item.base,
-            expanded: expanded
-          };
-
-          beforeBind(data, this);
         }
       });
     })();

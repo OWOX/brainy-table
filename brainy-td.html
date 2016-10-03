@@ -67,19 +67,10 @@
           hidden: Boolean,
           order: Number,
           template: Object,
-          width: String,
-
-          beforeBind: {
-            type: Object,
-            value: function() {
-              return function(data, cell) {};
-            }
-          }
+          width: String
         },
 
         observers: [
-          '_beforeBind(beforeBind, column.*, index, item.*, expanded)',
-          '_beforeBindHeader(beforeBind, column.*)',
           '_alignRightChanged(alignRight)',
           '_columnChanged(_instance, column)',
           '_columnPathChanged(_instance, column.*)',
@@ -101,29 +92,6 @@
 
         _alignRightChanged: function(alignRight) {
           this.style.flexDirection = alignRight ? 'row-reverse' : 'row';
-        },
-
-        _beforeBind: function(beforeBind, column, index, item, expanded) {
-          var data = {
-            column: column.base,
-            index: index,
-            item: item.base,
-            expanded: expanded
-          };
-
-          beforeBind(data, this);
-        },
-
-        // header cells aren't bound with item, index etc. so _beforeBind is never
-        // called for them so we need a separate observer.
-        _beforeBindHeader: function(beforeBind, column) {
-          if (this.header) {
-            var data = {
-              column: column.base
-            };
-
-            beforeBind(data, this);
-          }
         },
 
         _hiddenChanged: function(hidden) {

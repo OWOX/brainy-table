@@ -29,7 +29,6 @@
           <brainy-td
             header
             align-right="[[column.alignRight]]"
-            before-bind="[[beforeCellBind]]"
             column="[[column]]"
             flex="[[column.flex]]"
             hidden="[[column.hidden]]"
@@ -53,7 +52,6 @@
       <template id="rows" is="dom-repeat" items="{{items}}" sort="[[_computeSort(sortOrder.*)]]" filter="[[_computeFilter(filter.*)]]">
         <div class="item">
           <brainy-tr
-            before-bind="[[beforeRowBind]]"
             even$="[[!_isEven(index)]]"
             expanded="[[_isExpanded(item, expandedItems, expandedItems.*)]]"
             index="[[index]]"
@@ -74,7 +72,6 @@
                 on-click="_onCellClick"
                 order="[[column.order]]"
                 width="[[column.width]]"
-                before-bind="[[beforeCellBind]]"
               ></brainy-td>
             </template>
             <template is="dom-if" if="[[_isExpanded(item, expandedItems)]]">
@@ -82,7 +79,6 @@
                 index="[[index]]"
                 item="[[item]]"
                 expanded="[[_isExpanded(item, expandedItems, expandedItems.*)]]"
-                before-bind="[[beforeDetailsBind]]"
                 table="[[_this]]"
                 template="[[_rowDetail]]"
               ></brainy-tr-detail>
@@ -108,42 +104,6 @@
         ],
 
         properties: {
-
-          /**
-           * A function that is called before data is bound to a row or header cell.
-           * Can be used to customize the cell element depending on the data.
-           * #### Example:
-           * ```js
-           * function(data, cell) {
-           *   cell.toggleClass('custom', data.useCustomClass);
-           * }
-           * ```
-           */
-          beforeCellBind: Object,
-
-          /**
-           * A function that is called before data is bound to a row details element.
-           * Can be used to customize the element depending on the data.
-           * #### Example:
-           * ```js
-           * function(data, details) {
-           *   details.toggleClass('custom', data.useCustomClass);
-           * }
-           * ```
-           */
-          beforeDetailsBind: Object,
-
-          /**
-           * A function that is called before data is bound to a row.
-           * Can be used to customize the row element depending on the data.
-           * #### Example:
-           * ```js
-           * function(data, row) {
-           *   row.toggleClass('custom', data.useCustomClass);
-           * }
-           * ```
-           */
-          beforeRowBind: Object,
 
           /**
            * An array containing the items which will be stamped to the column template

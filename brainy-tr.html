@@ -58,7 +58,6 @@
         is: 'brainy-tr',
 
         properties: {
-          beforeBind: Object,
           expanded: {
             type: Boolean,
             reflectToAttribute: true
@@ -70,10 +69,6 @@
             value: { id: 0 }
           }
         },
-
-        observers: [
-          '_beforeBind(beforeBind, index, item.*, expanded)'
-        ],
 
         attached: function() {
           if (this.domHost && this.domHost.tagName.toUpperCase() === 'BRAINY-TABLE') {
@@ -93,16 +88,6 @@
               this._ownerShadyRoot = undefined;
             }
           }
-        },
-
-        _beforeBind: function(beforeBind, index, item, expanded) {
-          var data = {
-            index: index,
-            item: item.base,
-            expanded: expanded
-          };
-
-          beforeBind(data, this);
         }
       });
     })();
