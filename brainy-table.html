@@ -12,10 +12,41 @@
     <style>
       :host {
         display: block;
-        overflow-x: auto;
-        -webkit-overflow-scrolling: touch;
+        position: relative;
 
         @apply(--brainy-table);
+      }
+
+      :host #wrapper {
+        position: static;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+      }
+
+      :host #wrapper.left-shadow::before {
+        display: block;
+        content: "";
+        position: absolute;
+        width: 7px;
+        top: 0;
+        left: 0;
+        bottom: 0;
+        background: linear-gradient(to right, rgba(37, 37,37, 0.3), transparent);
+
+        @apply(--brainy-table-left-shadow);
+      }
+
+      :host #wrapper.right-shadow::after {
+        display: block;
+        content: "";
+        position: absolute;
+        width: 7px;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        background: linear-gradient(to right, transparent, rgba(37, 37,37, 0.3));
+
+        @apply(--brainy-table-right-shadow);
       }
 
       :host([details-enabled]) ::content brainy-tr:not([header]):hover {
@@ -23,69 +54,71 @@
       }
     </style>
 
-    <div id="header">
-      <brainy-tr header>
-        <template is="dom-repeat" items="[[columns]]" as="column">
-          <brainy-td
-            header
-            align-right="[[column.alignRight]]"
-            column="[[column]]"
-            flex="[[column.flex]]"
-            hidden="[[column.hidden]]"
-            order="[[column.order]]"
-            table="[[_this]]"
-            template="[[column.headerTemplate]]"
-            width="[[column.width]]"
-          >
-            <brainy-table-column-sort
-              sort-order="[[sortOrder]]"
-              path="[[column.sortBy]]"
-              on-sort-direction-changed="_sortDirectionChanged"
-              hidden$="[[!column.sortBy]]"
-            ></brainy-table-column-sort>
-          </brainy-td>
-        </template>
-      </brainy-tr>
-    </div>
+    <div id="wrapper" on-scroll="_onHorizontalScroll">
+      <div id="header">
+        <brainy-tr header>
+          <template is="dom-repeat" items="[[columns]]" as="column">
+            <brainy-td
+              header
+              align-right="[[column.alignRight]]"
+              column="[[column]]"
+              flex="[[column.flex]]"
+              hidden="[[column.hidden]]"
+              order="[[column.order]]"
+              table="[[_this]]"
+              template="[[column.headerTemplate]]"
+              width="[[column.width]]"
+            >
+              <brainy-table-column-sort
+                sort-order="[[sortOrder]]"
+                path="[[column.sortBy]]"
+                on-sort-direction-changed="_sortDirectionChanged"
+                hidden$="[[!column.sortBy]]"
+              ></brainy-table-column-sort>
+            </brainy-td>
+          </template>
+        </brainy-tr>
+      </div>
 
-    <div id="container">
-      <template id="rows" is="dom-repeat" items="{{items}}" sort="[[_computeSort(sortOrder.*)]]" filter="[[_computeFilter(filter.*)]]">
-        <div class="item">
-          <brainy-tr
-            even$="[[!_isEven(index)]]"
-            expanded="[[_isExpanded(item, expandedItems, expandedItems.*)]]"
-            index="[[index]]"
-            item="[[item]]"
-            tabindex="-1"
-          >
-            <template is="dom-repeat" items="[[columns]]" as="column" index-as="colIndex">
-              <brainy-td
-                template="[[column.template]]"
-                table="[[_this]]"
-                align-right="[[column.alignRight]]"
-                column="[[column]]"
-                expanded="[[_isExpanded(item, expandedItems, expandedItems.*)]]"
-                flex="[[column.flex]]"
-                hidden="[[column.hidden]]"
-                index="[[index]]"
-                item="[[item]]"
-                on-click="_onCellClick"
-                order="[[column.order]]"
-                width="[[column.width]]"
-              ></brainy-td>
-            </template>
-            <template is="dom-if" if="[[_isExpanded(item, expandedItems)]]">
-              <brainy-tr-detail
-                index="[[index]]"
-                item="[[item]]"
-                expanded="[[_isExpanded(item, expandedItems, expandedItems.*)]]"
-                table="[[_this]]"
-                template="[[_rowDetail]]"
-              ></brainy-tr-detail>
-            </template>
-          </brainy-tr>
-        </div>
-      </template>
+      <div id="container">
+        <template id="rows" is="dom-repeat" items="{{items}}" sort="[[_computeSort(sortOrder.*)]]" filter="[[_computeFilter(filter.*)]]">
+          <div class="item">
+            <brainy-tr
+              even$="[[!_isEven(index)]]"
+              expanded="[[_isExpanded(item, expandedItems, expandedItems.*)]]"
+              index="[[index]]"
+              item="[[item]]"
+              tabindex="-1"
+            >
+              <template is="dom-repeat" items="[[columns]]" as="column" index-as="colIndex">
+                <brainy-td
+                  template="[[column.template]]"
+                  table="[[_this]]"
+                  align-right="[[column.alignRight]]"
+                  column="[[column]]"
+                  expanded="[[_isExpanded(item, expandedItems, expandedItems.*)]]"
+                  flex="[[column.flex]]"
+                  hidden="[[column.hidden]]"
+                  index="[[index]]"
+                  item="[[item]]"
+                  on-click="_onCellClick"
+                  order="[[column.order]]"
+                  width="[[column.width]]"
+                ></brainy-td>
+              </template>
+              <template is="dom-if" if="[[_isExpanded(item, expandedItems)]]">
+                <brainy-tr-detail
+                  index="[[index]]"
+                  item="[[item]]"
+                  expanded="[[_isExpanded(item, expandedItems, expandedItems.*)]]"
+                  table="[[_this]]"
+                  template="[[_rowDetail]]"
+                ></brainy-tr-detail>
+              </template>
+            </brainy-tr>
+          </div>
+        </template>
+      </div>
     </div>
 
     <content select="brainy-table-column"></content>
@@ -176,8 +209,7 @@
         listeners: {
           'column-filter-changed': '_onColumnFilterChanged',
           'item-changed': '_itemChanged',
-          'iron-resize': '_onResize',
-          'scroll': '_onHorizontalScroll'
+          'iron-resize': '_onResize'
         },
 
         observers: [
@@ -224,9 +256,12 @@
         },
 
         _resizeCellContainers: function () {
-          var width = Math.min(this.scrollWidth, this.clientWidth + this.scrollLeft) + 'px';
+          var wrapper = this.$.wrapper;
+          var width = Math.min(wrapper.scrollWidth, wrapper.clientWidth + wrapper.scrollLeft) + 'px';
           this.$.container.style.width = width;
           this.$.header.style.width = width;
+          this.toggleClass('left-shadow', wrapper.scrollLeft > 0, wrapper);
+          this.toggleClass('right-shadow', wrapper.scrollLeft + wrapper.clientWidth < wrapper.scrollWidth, wrapper);
         },
 
         _onResize: function() {
@@ -237,11 +272,7 @@
         },
 
         _onHorizontalScroll: function() {
-          if (!this.isDebouncerActive('scrolling')) {
-            this.$.container.style.width = this.scrollWidth + 'px';
-            this.$.header.style.width = this.scrollWidth + 'px';
-            this.debounce('scrolling', this._resizeCellContainers);
-          }
+          this.debounce('scrolling', this._resizeCellContainers, 25);
         },
 
         _sortDirectionChanged: function(e) {
