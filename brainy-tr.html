@@ -23,6 +23,7 @@
 
       :host(:focus) {
         outline: none;
+
         @apply(--brainy-tr-focused);
       }
 
@@ -30,11 +31,11 @@
         @apply(--brainy-tr-hover);
       }
 
-      :host(:focus):after {
+      :host(:focus)::after {
         @apply(--brainy-tr-focused-after);
       }
 
-      :host:after {
+      :host::after {
         @apply(--brainy-tr-after);
       }
 
