@@ -5,15 +5,5 @@
     "type": "git",
     "url": "git+https://github.com/web-padawan/brainy-table.git"
   },
-  "license": "MIT",
-  "main": "index.html",
-  "dependencies": {
-    "bower": "^1.7.7"
-  },
-  "devDependencies": {
-    "web-component-tester": "4.3.1"
-  },
-  "scripts": {
-    "test": "node_modules/web-component-tester/bin/wct"
-  }
+  "license": "MIT"
 }
