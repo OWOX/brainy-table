@@ -1,7 +1,11 @@
 <script>
   var Brainy = window.Brainy || {};
 
-  /** @polymerBehavior */
+  /**
+   * A base behavior implemented by cells and row details instances.
+   *
+   * @polymerBehavior Brainy.TableTemplatizerBehavior
+   */
   Brainy.TableTemplatizerBehaviorImpl = {
     properties: {
       expanded: Boolean,
@@ -137,7 +141,9 @@
     }
   };
 
-  /** @polymerBehavior */
+  /**
+   * @polymerBehavior
+   */
   Brainy.TableTemplatizerBehavior = [
     Polymer.Templatizer,
     Brainy.TableTemplatizerBehaviorImpl
