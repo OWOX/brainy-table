@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/web-padawan/brainy-table.svg?branch=master)](https://travis-ci.org/web-padawan/brainy-table)
+
 # &lt;brainy-table&gt;
 
 `brainy-table` is a Polymer 1.x data table element.
