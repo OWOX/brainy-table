@@ -1,0 +1,54 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <script src="../../webcomponentsjs/webcomponents-lite.js"></script>
+  <script src="../../web-component-tester/browser.js"></script>
+  <script src="../../test-fixture/test-fixture-mocha.js"></script>
+  <link rel="import" href="common.html">
+  <link rel="import" href="../../iron-test-helpers/iron-test-helpers.html">
+  <link rel="import" href="../brainy-table.html">
+</head>
+<body>
+  <test-fixture id="table">
+    <template>
+      <brainy-table>
+        <brainy-table-column name="First Name">
+          <template>[[item.user.name.first]]</template>
+        </brainy-table-column>
+        <brainy-table-column name="Last Name">
+          <template>[[item.user.name.last]]</template>
+        </brainy-table-column>
+      </brainy-table>
+    </template>
+  </test-fixture>
+
+  <script>
+    describe('Data binding', function() {
+      var table;
+      beforeEach(function(done) {
+        table = fixture('table');
+        Polymer.dom.flush();
+        table.items = window.users;
+        Polymer.Base.async(done, 200);
+      });
+      describe('items', function() {
+        it('should be observed for shift', function(done) {
+          var newItem = {user: {name: {first: 'foo'} }};
+          table.push('items', newItem);
+          table.async(function() {
+            var row = table.querySelectorAll('brainy-tr:not([header])')[2];
+            expect(row.querySelector('brainy-td').textContent.trim()).to.equal('foo');
+            done();
+          }, 200);
+        });
+        it('should be observed for mutation', function() {
+          table.set('items.1.user.name.first', 'bar');
+          var row = table.queryAllEffectiveChildren('brainy-tr:not([header])')[1];
+          expect(row.querySelector('brainy-td').textContent.trim()).to.equal('bar');
+        });
+      });
+    });
+  </script>
+</body>
+</html>
