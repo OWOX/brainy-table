@@ -226,6 +226,14 @@ Follows the guidelines of [Material Design](https://material.google.com/componen
             }
           },
 
+          /**
+           * If `true`, no horizontal scroll shadows will appear.
+           */
+          noScrollShadows: {
+            type: Boolean,
+            value: false
+          },
+
           _rowDetail: Object,
 
           _this: {
@@ -290,8 +298,10 @@ Follows the guidelines of [Material Design](https://material.google.com/componen
           var width = Math.min(wrapper.scrollWidth, wrapper.clientWidth + wrapper.scrollLeft) + 'px';
           this.$.container.style.width = width;
           this.$.header.style.width = width;
-          this.toggleClass('left-shadow', wrapper.scrollLeft > 0, wrapper);
-          this.toggleClass('right-shadow', wrapper.scrollLeft + wrapper.clientWidth < wrapper.scrollWidth, wrapper);
+          if (!this.noScrollShadows) {
+            this.toggleClass('left-shadow', wrapper.scrollLeft > 0, wrapper);
+            this.toggleClass('right-shadow', wrapper.scrollLeft + wrapper.clientWidth < wrapper.scrollWidth, wrapper);
+          }
         },
 
         _onResize: function() {
