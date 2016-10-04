@@ -7,6 +7,29 @@
 <link rel="import" href="brainy-tr.html">
 <link rel="import" href="brainy-tr-detail.html">
 
+<!--
+`brainy-table` is a Polymer 1.x data table element.
+
+Inspired by [iron-data-table](https://github.com/Saulis/iron-data-table).
+Follows the guidelines of [Material Design](https://material.google.com/components/data-tables.html).
+
+## Features
+- Data filtering
+- Data sorting
+- Multi-column sorting
+- Template support for each column
+- Two-way binding support
+- Custom styling support for templates
+- Flex support for cells
+- Native Shadow DOM support
+- Column manipulation, resizing, hiding, reordering
+- Custom header templates
+- Row details
+
+@element brainy-table
+@demo demo/index.html
+-->
+
 <dom-module id="brainy-table">
   <template>
     <style>
@@ -31,7 +54,7 @@
         top: 0;
         left: 0;
         bottom: 0;
-        background: linear-gradient(to right, rgba(37, 37,37, 0.3), transparent);
+        background: linear-gradient(to right, rgba(37, 37, 37, 0.3), transparent);
 
         @apply(--brainy-table-left-shadow);
       }
@@ -44,13 +67,15 @@
         top: 0;
         right: 0;
         bottom: 0;
-        background: linear-gradient(to right, transparent, rgba(37, 37,37, 0.3));
+        background: linear-gradient(to right, transparent, rgba(37, 37, 37, 0.3));
 
         @apply(--brainy-table-right-shadow);
       }
 
       :host([details-enabled]) ::content brainy-tr:not([header]):hover {
+        background: #eee;
         cursor: pointer;
+        @apply(--brainy-table-details-enabled-tr-hover);
       }
     </style>
 
@@ -139,7 +164,7 @@
         properties: {
 
           /**
-           * An array containing the items which will be stamped to the column template
+           * An array containing the items which will be stamped to the column template.
            * instances.
            */
           items: {
@@ -156,7 +181,7 @@
           },
 
           /**
-           * An array containing path/filter value pairs that are used to filter the items
+           * An array containing path/filter value pairs that are used to filter the items.
            */
           filter: {
             type: Array,
@@ -171,13 +196,14 @@
            */
           sortOrder: {
             type: Array,
+            notify: true,
             value: function() {
               return [];
             }
           },
 
           /**
-           * An array of `brainy-table-column` elements which contain the templates
+           * An array of `brainy-table-column` elements which contain the templates.
            * to be stamped with items.
            */
           columns: {
@@ -189,8 +215,12 @@
             }
           },
 
+          /**
+           * An array containing items with expanded row details.
+           */
           expandedItems: {
             type: Array,
+            notify: true,
             value: function() {
               return [];
             }
