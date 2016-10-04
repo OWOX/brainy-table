@@ -1,18 +1,19 @@
 # &lt;brainy-table&gt;
 
-A work-in-progress Polymer 1.x data table element.
+`brainy-table` is a Polymer 1.x data table element.
 
-Light version of [iron-data-table](https://github.com/Saulis/iron-data-table) by @Saulis.
+Inspired by [iron-data-table](https://github.com/Saulis/iron-data-table).
+Follows the guidelines of [Material Design](https://material.google.com/components/data-tables.html).
 
 ## Features
 - Data filtering
 - Data sorting
-- Multi-Column sorting
+- Multi-column sorting
 - Template support for each column
 - Two-way binding support
 - Custom styling support for templates
-- Flex support for Cells
+- Flex support for cells
 - Native Shadow DOM support
 - Column manipulation, resizing, hiding, reordering
-- Custom Header templates
-- Row Details
+- Custom header templates
+- Row details
