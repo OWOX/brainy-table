@@ -2,22 +2,19 @@
 
 <dom-module id="brainy-table-column-filter">
   <style>
-    :host([hidden]) {
-      display: none;
-    }
-
-    paper-input {
-      --paper-input-container: {
-        margin-bottom: 20px;
-      };
+    :host {
       --paper-input-container-label: {
         font-size: inherit;
       }
     }
+
+    :host([hidden]) {
+      display: none;
+    }
   </style>
 
   <template>
-    <paper-input label="[[label]]" value="[[value]]" on-value-changed="_valueChanged"></paper-input>
+    <paper-input label="[[label]]" no-label-float value="[[value]]" on-value-changed="_valueChanged"></paper-input>
   </template>
   <script>
     (function() {
