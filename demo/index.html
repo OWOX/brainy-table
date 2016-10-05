@@ -12,6 +12,8 @@
     };
   </script>
   <link rel="import" href="../../iron-ajax/iron-ajax.html">
+  <link rel="import" href="../../iron-icon/iron-icon.html">
+  <link rel="import" href="../../iron-icons/iron-icons.html">
   <link rel="import" href="../../iron-flex-layout/iron-flex-layout-classes.html">
   <link rel="import" href="../../iron-pages/iron-pages.html">
   <link rel="import" href="../../iron-demo-helpers/demo-snippet.html">
@@ -24,6 +26,10 @@
 
 <body class="fullbleed">
   <style is="custom-style" include="demo-pages-shared-styles">
+    #tabs {
+      border-bottom: solid 1px #ddd;
+    }
+
     .centered {
       max-width: 800px;
     }
@@ -170,6 +176,40 @@
               </brainy-table-column>
               <brainy-table-column name="Email">
                 <template>[[item.user.email]]</template>
+              </brainy-table-column>
+
+              <template is="row-detail">
+                <div>[[item.user.location.street]], [[item.user.location.city]], [[item.user.location.state]]</div>
+              </template>
+            </brainy-table>
+          </template>
+        </template>
+      </demo-snippet>
+      <h4>Styling expand indicator</h4>
+      <demo-snippet>
+        <template>
+          <template is="dom-bind">
+            <iron-ajax auto url="users.json" last-response="{{users}}"></iron-ajax>
+
+            <brainy-table details-enabled items="[[users.data]]">
+              <brainy-table-column name="First Name">
+                <template>[[item.user.name.first]]</template>
+              </brainy-table-column>
+              <brainy-table-column name="Last Name">
+                <template>[[item.user.name.last]]</template>
+              </brainy-table-column>
+              <brainy-table-column name="Email">
+                <template>[[item.user.email]]</template>
+              </brainy-table-column>
+              <brainy-table-column name="" width="20px" align-right flex="0">
+                <template>
+                  <template is="dom-if" if="[[!expanded]]">
+                    <iron-icon icon="icons:expand-more"></iron-icon>
+                  </template>
+                  <template is="dom-if" if="[[expanded]]">
+                    <iron-icon icon="icons:expand-less"></iron-icon>
+                  </template>
+                </template>
               </brainy-table-column>
 
               <template is="row-detail">
