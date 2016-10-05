@@ -93,6 +93,19 @@ Follows the guidelines of [Material Design](https://material.google.com/componen
         -ms-user-select: none;
         user-select: none;
       }
+
+      :host:not([no-custom-scroll]) #wrapper::-webkit-scrollbar-thumb {
+        background: #a1a0a0;
+
+        @apply(--brainy-table-webkit-scrollbar-thumb);
+      }
+
+      :host:not([no-custom-scroll]) #wrapper::-webkit-scrollbar {
+        width: 6px;
+        height: 6px;
+
+        @apply(--brainy-table-webkit-scrollbar);
+      }
     </style>
 
     <div id="wrapper" on-scroll="_onHorizontalScroll">
@@ -249,6 +262,15 @@ Follows the guidelines of [Material Design](https://material.google.com/componen
             value: function() {
               return [];
             }
+          },
+
+          /**
+           * If `true`, custom webkit scroll bar styling will be disabled.
+           */
+          noCustomScroll: {
+            type: Boolean,
+            reflectToAttribute: true,
+            value: false
           },
 
           /**
