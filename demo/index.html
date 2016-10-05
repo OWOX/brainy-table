@@ -18,6 +18,7 @@
   <link rel="import" href="../../iron-demo-helpers/demo-pages-shared-styles.html">
   <link rel="import" href="../../paper-tabs/paper-tabs.html">
   <link rel="import" href="../../paper-checkbox/paper-checkbox.html">
+  <link rel="import" href="../../vaadin-combo-box/vaadin-combo-box.html">
   <link rel="import" href="../brainy-table.html">
 </head>
 
@@ -39,7 +40,7 @@
     <paper-tab tab="filtering">Filtering</paper-tab>
     <paper-tab tab="sorting">Sorting</paper-tab>
     <paper-tab tab="details">Row details</paper-tab>
-    <paper-tab tab="expand">Expand toggle</paper-tab>
+    <paper-tab tab="scroll">Scroll</paper-tab>
   </paper-tabs>
 
   <iron-pages id="pages" class="centered" attr-for-selected="tab" fallback-selection="basic">
@@ -51,6 +52,9 @@
             <iron-ajax auto url="users.json" last-response="{{users}}"></iron-ajax>
 
             <brainy-table items="[[users.data]]">
+              <brainy-table-column name="#" flex="0" width="50px">
+                <template>[[index]]</template>
+              </brainy-table-column>
               <brainy-table-column name="First Name">
                 <template>[[item.user.name.first]]</template>
               </brainy-table-column>
@@ -73,14 +77,55 @@
             <iron-ajax auto url="users.json" last-response="{{users}}"></iron-ajax>
 
             <brainy-table items="[[users.data]]">
+              <brainy-table-column name="Title">
+                <template>[[item.user.name.title]]</template>
+              </brainy-table-column>
               <brainy-table-column name="First Name" filter-by="user.name.first">
                 <template>[[item.user.name.first]]</template>
               </brainy-table-column>
               <brainy-table-column name="Last Name">
                 <template>[[item.user.name.last]]</template>
               </brainy-table-column>
-              <brainy-table-column name="Email">
-                <template>[[item.user.email]]</template>
+              <brainy-table-column name="Phone">
+                <template>[[item.user.phone]]</template>
+              </brainy-table-column>
+            </brainy-table>
+          </template>
+        </template>
+      </demo-snippet>
+      <h4>Custom filter input</h4>
+      <demo-snippet>
+        <template>
+          <template is="dom-bind">
+            <style is="custom-style">
+              vaadin-combo-box {
+                --paper-input-container-label: {
+                  font-size: inherit;
+                }
+              }
+            </style>
+            <iron-ajax auto url="users.json" last-response="{{users}}"></iron-ajax>
+
+            <brainy-table items="[[users.data]]">
+              <brainy-table-column name="Title" filter-by="user.name.title">
+                <template is="header">
+                  <vaadin-combo-box
+                    label="[[column.name]]"
+                    value="{{column.filterValue}}"
+                    no-label-float
+                    allow-custom-value
+                  ></vaadin-combo-box>
+                </template>
+                <template>[[item.user.name.title]]</template>
+              </brainy-table-column>
+              <brainy-table-column name="First Name" filter-by="user.name.first">
+                <template>[[item.user.name.first]]</template>
+              </brainy-table-column>
+              <brainy-table-column name="Last Name">
+                <template>[[item.user.name.last]]</template>
+              </brainy-table-column>
+              <brainy-table-column name="Phone">
+                <template>[[item.user.phone]]</template>
               </brainy-table-column>
             </brainy-table>
           </template>
@@ -134,9 +179,7 @@
           </template>
         </template>
       </demo-snippet>
-    </div>
-    <div tab="expand">
-      <h4>Expand toggle</h4>
+      <h4>Custom expand toggle</h4>
       <demo-snippet>
         <template>
           <template is="dom-bind">
@@ -166,12 +209,68 @@
         </template>
       </demo-snippet>
     </div>
+    <div tab="scroll">
+      <h4>Drag and drop scroll, scrolling shadows, custom webkit scroll</h4>
+      <demo-snippet>
+        <template>
+          <template is="dom-bind">
+            <iron-ajax auto url="users.json" last-response="{{users}}"></iron-ajax>
+
+            <brainy-table drag-scrollable items="[[users.data]]">
+              <brainy-table-column name="First Name" width="150px">
+                <template>[[item.user.name.first]]</template>
+              </brainy-table-column>
+              <brainy-table-column name="Last Name" width="150px">
+                <template>[[item.user.name.last]]</template>
+              </brainy-table-column>
+              <brainy-table-column name="Email" width="150px">
+                <template>[[item.user.email]]</template>
+              </brainy-table-column>
+              <brainy-table-column name="Username" width="150px">
+                <template>[[item.user.username]]</template>
+              </brainy-table-column>
+              <brainy-table-column name="Phone" width="150px">
+                <template>[[item.user.phone]]</template>
+              </brainy-table-column>
+            </brainy-table>
+          </template>
+        </template>
+      </demo-snippet>
+      <h4>No scrolling shadows, no custom webkit scroll</h4>
+      <demo-snippet>
+        <template>
+          <template is="dom-bind">
+            <iron-ajax auto url="users.json" last-response="{{users}}"></iron-ajax>
+
+            <brainy-table no-custom-scroll no-scroll-shadows items="[[users.data]]">
+              <brainy-table-column name="First Name" width="150px">
+                <template>[[item.user.name.first]]</template>
+              </brainy-table-column>
+              <brainy-table-column name="Last Name" width="150px">
+                <template>[[item.user.name.last]]</template>
+              </brainy-table-column>
+              <brainy-table-column name="Email" width="150px">
+                <template>[[item.user.email]]</template>
+              </brainy-table-column>
+              <brainy-table-column name="Username" width="150px">
+                <template>[[item.user.username]]</template>
+              </brainy-table-column>
+              <brainy-table-column name="Phone" width="150px">
+                <template>[[item.user.phone]]</template>
+              </brainy-table-column>
+            </brainy-table>
+          </template>
+        </template>
+      </demo-snippet>
+    </div>
 
 
   </iron-pages>
 
   <script>
-    HTMLImports.whenReady(function() {
+    document.addEventListener('WebComponentsReady', function() {
+      document.querySelector('vaadin-combo-box').items = ['mr', 'ms', 'miss'];
+
       var tabs = document.getElementById('tabs');
 
       tabs.addEventListener('iron-select', function(e) {
