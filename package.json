@@ -14,7 +14,7 @@
     "stylelint": "^7.3.1",
     "stylelint-config-polymer": "^0.0.1",
     "stylelint-processor-html": "^1.0.0",
-    "web-component-tester": "4.3.1"
+    "web-component-tester": "^4.3.4"
   },
   "scripts": {
     "lint:js": "eslint *.html **/*.html --ext .html",
