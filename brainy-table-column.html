@@ -197,7 +197,9 @@
 
         _filterValueChanged: function(table, filterValue, filterBy) {
           this._notifyTable(table, 'filterValue', filterValue);
-          this.fire('column-filter-changed', {value: filterValue, filterBy: filterBy});
+          this.fire('column-filter-changed', {
+            value: filterValue, filterBy: filterBy
+          });
         }
       });
     })();

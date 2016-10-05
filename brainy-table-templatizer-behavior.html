@@ -40,7 +40,9 @@
 
       // fix _rootDataHost to the context where template has been defined
       if (template._rootDataHost) {
-        this._getRootDataHost = function() { return template._rootDataHost; };
+        this._getRootDataHost = function() {
+          return template._rootDataHost;
+        };
       }
 
       var instance = this.stamp();
@@ -108,7 +110,6 @@
       instance.notifyPath(item.path, item.value);
     },
 
-    /** templatizer */
     _forwardParentProp: function(prop, value) {
       if (this._instance) {
         this._instance[prop] = value;

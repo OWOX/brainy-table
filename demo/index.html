@@ -171,10 +171,10 @@
   </iron-pages>
 
   <script>
-    HTMLImports.whenReady(function () {
+    HTMLImports.whenReady(function() {
       var tabs = document.getElementById('tabs');
 
-      tabs.addEventListener('iron-select', function (e) {
+      tabs.addEventListener('iron-select', function(e) {
         document.getElementById('pages').select(e.detail.item.getAttribute('tab'));
       });
     });
