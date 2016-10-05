@@ -20,7 +20,7 @@
     "lint:js": "eslint *.html **/*.html --ext .html",
     "lint:css": "stylelint **/*.html",
     "lint": "npm-run-all --parallel lint:*",
-    "pretest": "npm run lint:css",
+    "pretest": "npm run lint",
     "test": "wct"
   }
 }
