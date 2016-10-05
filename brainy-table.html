@@ -311,7 +311,7 @@ Follows the guidelines of [Material Design](https://material.google.com/componen
         },
 
         _onHorizontalScroll: function() {
-          this.debounce('scrolling', this._resizeCellContainers, 25);
+          this.debounce('scrolling', this._resizeCellContainers);
         },
 
         _sortDirectionChanged: function(e) {
