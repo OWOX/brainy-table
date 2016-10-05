@@ -19,3 +19,5 @@ Follows the guidelines of [Material Design](https://material.google.com/componen
 - Column manipulation, resizing, hiding, reordering
 - Custom header templates
 - Row details
+- Horizontal scrolling shadows
+- "Drag-and-drop" scroll

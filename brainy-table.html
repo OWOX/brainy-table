@@ -77,6 +77,22 @@ Follows the guidelines of [Material Design](https://material.google.com/componen
 
         @apply(--brainy-table-details-enabled-tr-hover);
       }
+
+      :host(.draggable) ::content brainy-tr {
+        cursor: -webkit-grab;
+        cursor: -moz-grab;
+        cursor: grab;
+      }
+
+      :host(.dragging) ::content brainy-tr {
+        cursor: -webkit-grabbing;
+        cursor: -moz-grabbing;
+        cursor: grabbing;
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+      }
     </style>
 
     <div id="wrapper" on-scroll="_onHorizontalScroll">
@@ -177,6 +193,15 @@ Follows the guidelines of [Material Design](https://material.google.com/componen
           detailsEnabled: {
             type: Boolean,
             reflectToAttribute: true,
+            value: false
+          },
+
+          /**
+           * If `true`, enables scrolling via holding the mouse button ("drag and drop" or "click and hold" style).
+           */
+          dragScrollable: {
+            type: Boolean,
+            observer: '_dragScrollableChanged',
             value: false
           },
 
@@ -284,6 +309,62 @@ Follows the guidelines of [Material Design](https://material.google.com/componen
           }.bind(this));
         },
 
+        _dragScrollableChanged: function(dragScrollable, oldDragScrollable) {
+          var wrapper = this.$.wrapper;
+          if (dragScrollable) {
+            this.listen(wrapper, 'mousedown', '_startDragging');
+            this.listen(wrapper, 'mouseup', '_stopDragging');
+            this.listen(wrapper, 'mousemove', '_processDragging');
+            this.listen(wrapper, 'mouseleave', '_cancelDragging');
+            this.listen(wrapper, 'selectstart', '_preventSelectOnDrag');
+          } else if (!dragScrollable && oldDragScrollable) {
+            this.unlisten(wrapper, 'mousedown', '_startDragging');
+            this.unlisten(wrapper, 'mouseup', '_stopDragging');
+            this.unlisten(wrapper, 'mousemove', '_processDragging');
+            this.unlisten(wrapper, 'mouseleave', '_cancelDragging');
+            this.unlisten(wrapper, 'selectstart', '_preventSelectOnDrag');
+          }
+        },
+
+        _startDragging: function(e) {
+          var wrapper = this.$.wrapper;
+          if (wrapper.clientWidth < wrapper.scrollWidth) {
+            wrapper.dataset.lastClientX = e.clientX;
+            this.toggleClass('dragging', true);
+          }
+        },
+
+        _stopDragging: function(e) {
+          var wrapper = this.$.wrapper;
+          if (wrapper.clientWidth < wrapper.scrollWidth) {
+            wrapper.dataset.lastClientX = e.clientX;
+            this.toggleClass('dragging', false);
+          }
+        },
+
+        _cancelDragging: function() {
+          this.toggleClass('dragging', false);
+        },
+
+        _processDragging: function(e) {
+          var wrapper = this.$.wrapper;
+          if (this.classList.contains('dragging')) {
+            this.debounce('drag', function() {
+              var oldX = wrapper.dataset.lastClientX;
+              var diff = oldX - e.clientX;
+              wrapper.dataset.lastClientX = e.clientX;
+              wrapper.scrollLeft += diff;
+            }, 1);
+          }
+        },
+
+        _preventSelectOnDrag: function(e) {
+          // fix cursor appearance in Safari
+          if (this.classList.contains('dragging')) {
+            e.preventDefault();
+          }
+        },
+
         _stopPropagation: function(e) {
           e.stopImmediatePropagation();
         },
@@ -300,6 +381,9 @@ Follows the guidelines of [Material Design](https://material.google.com/componen
           if (!this.noScrollShadows) {
             this.toggleClass('left-shadow', wrapper.scrollLeft > 0, wrapper);
             this.toggleClass('right-shadow', wrapper.scrollLeft + wrapper.clientWidth < wrapper.scrollWidth, wrapper);
+          }
+          if (this.dragScrollable) {
+            this.toggleClass('draggable', wrapper.clientWidth < wrapper.scrollWidth);
           }
         },
 
