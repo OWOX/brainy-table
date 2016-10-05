@@ -26,6 +26,11 @@
   <script>
     describe('Data binding', function() {
       var table;
+      var getFirstCellText = function(table, index) {
+        var row = table.querySelectorAll('brainy-tr:not([header])')[index];
+        return row.querySelector('brainy-td').textContent.trim();
+      };
+
       beforeEach(function(done) {
         table = fixture('table');
         Polymer.dom.flush();
@@ -34,18 +39,16 @@
       });
       describe('items', function() {
         it('should be observed for shift', function(done) {
-          var newItem = {user: {name: {first: 'foo'} }};
+          var newItem = {user: {name: {first: 'foo'}}};
           table.push('items', newItem);
           table.async(function() {
-            var row = table.querySelectorAll('brainy-tr:not([header])')[2];
-            expect(row.querySelector('brainy-td').textContent.trim()).to.equal('foo');
+            expect(getFirstCellText(table, 2)).to.equal('foo');
             done();
           }, 200);
         });
         it('should be observed for mutation', function() {
           table.set('items.1.user.name.first', 'bar');
-          var row = table.queryAllEffectiveChildren('brainy-tr:not([header])')[1];
-          expect(row.querySelector('brainy-td').textContent.trim()).to.equal('bar');
+          expect(getFirstCellText(table, 1)).to.equal('bar');
         });
       });
     });
