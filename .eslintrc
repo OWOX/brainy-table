@@ -2,8 +2,14 @@
   "extends": "google",
   "plugins": [ "html" ],
   "rules":  {
-    "new-cap": ["error", {"capIsNewExceptions": ["Polymer"]}],
-    "linebreak-style": "off"
+    "new-cap": ["error", {
+      "capIsNewExceptions": ["Polymer"],
+      "newIsCapExceptionPattern": "this.ctor"
+    }],
+    "max-len": ["error", 120, 2, {
+      "ignoreComments": true,
+      "ignoreUrls": true
+    }]
   },
   "env": {
     "browser": true,
@@ -11,6 +17,7 @@
   },
   "globals": {
     "Polymer": true,
+    "HTMLImports": true,
     "Brainy": true,
     "WCT": true,
     "expect": true,
