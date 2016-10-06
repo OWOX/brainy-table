@@ -13,7 +13,7 @@
 Inspired by [iron-data-table](https://github.com/Saulis/iron-data-table).
 Follows the guidelines of [Material Design](https://material.google.com/components/data-tables.html).
 
-## Features
+### Features
 - Data filtering
 - Data sorting
 - Multi-column sorting
@@ -25,6 +25,27 @@ Follows the guidelines of [Material Design](https://material.google.com/componen
 - Column manipulation, resizing, hiding, reordering
 - Custom header templates
 - Row details
+
+
+### Styling
+The following custom properties and mixins are available for styling:
+
+Custom property                          | Description                                      | Default
+-----------------------------------------|--------------------------------------------------|---------------
+`--brainy-table`                         | Mixin applied to the main element                | `{}`
+`--brainy-table-left-shadow-background`  | Left scrolling shadow background                 | `linear-gradient(to right, rgba(37, 37, 37, 0.3), transparent)`
+`--brainy-table-left-shadow-width`       | Left scrolling shadow width                      | `7px`
+`--brainy-table-right-shadow-background` | Right scrolling shadow background                | `linear-gradient(to right, transparent, rgba(37, 37, 37, 0.3))`
+`--brainy-table-right-shadow-width`      | Right scrolling shadow width                     | `7px`
+`--brainy-table-webkit-scrollbar-thumb`  | Mixin applied to the webkit scrollbar thumb      | `{}`
+`--brainy-table-webkit-scrollbar`        | Mixin applied to the webkit scrollbar            | `{}`
+`--brainy-tr`                            | Mixin applied to the row item element            | `{}`
+`--brainy-tr-even`                       | Mixin applied to even rows                       | `{}`
+`--brainy-tr-odd`                        | Mixin applied to odd rows                        | `{}`
+`--brainy-tr-hover`                      | Mixin applied to the row in hover state          | `{}`
+`--brainy-tr-focused`                    | Mixin applied to the row in focused state        | `{}`
+`--brainy-tr-after`                      | Mixin applied to ::after rows                    | `{}`
+`--brainy-tr-focused-after`              | Mixin applied to ::after focused rows            | `{}`
 
 @element brainy-table
 @demo demo/index.html
@@ -50,26 +71,22 @@ Follows the guidelines of [Material Design](https://material.google.com/componen
         display: block;
         content: "";
         position: absolute;
-        width: 7px;
+        width: var(--brainy-table-left-shadow-width, 7px);
         top: 0;
         left: 0;
         bottom: 0;
-        background: linear-gradient(to right, rgba(37, 37, 37, 0.3), transparent);
-
-        @apply(--brainy-table-left-shadow);
+        background: var(--brainy-table-left-shadow-background, linear-gradient(to right, rgba(37, 37, 37, 0.3), transparent));
       }
 
       :host #wrapper.right-shadow::after {
         display: block;
         content: "";
         position: absolute;
-        width: 7px;
+        width: var(--brainy-table-right-shadow-width, 7px);
         top: 0;
         right: 0;
         bottom: 0;
-        background: linear-gradient(to right, transparent, rgba(37, 37, 37, 0.3));
-
-        @apply(--brainy-table-right-shadow);
+        background: var(--brainy-table-right-shadow-background, linear-gradient(to right, transparent, rgba(37, 37, 37, 0.3)));
       }
 
       :host([details-enabled]) ::content brainy-tr:not([header]):hover {
@@ -139,6 +156,8 @@ Follows the guidelines of [Material Design](https://material.google.com/componen
           <div class="item">
             <brainy-tr
               even$="[[!_isEven(index)]]"
+              first$="[[_isFirst(index)]]"
+              last$="[[_isLast(index, items.length)]]"
               expanded="[[_isExpanded(item, expandedItems, expandedItems.*)]]"
               index="[[index]]"
               item="[[item]]"
@@ -393,6 +412,14 @@ Follows the guidelines of [Material Design](https://material.google.com/componen
 
         _isEven: function(index) {
           return index % 2 === 0;
+        },
+
+        _isFirst: function(index) {
+          return index === 0;
+        },
+
+        _isLast: function(index, length) {
+          return length - index === 1;
         },
 
         _resizeCellContainers: function() {

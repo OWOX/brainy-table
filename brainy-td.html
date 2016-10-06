@@ -79,7 +79,7 @@
 
         attached: function() {
           if (!Polymer.Settings.useNativeShadow) {
-            // cell is supposed to be placed outside the local dom of iron-data-table.
+            // cell is supposed to be placed outside the local dom of brainy-table.
             Polymer.StyleTransformer.dom(this, 'brainy-table', this._scopeCssViaAttr, true);
             if (this.domHost) {
               Polymer.StyleTransformer.dom(this, this.domHost.tagName.toLowerCase(), this._scopeCssViaAttr, false);
