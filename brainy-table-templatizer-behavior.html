@@ -13,6 +13,11 @@
       item: Object,
       table: Object,
       template: Object,
+      // singleton
+      _instances: {
+        type: Array,
+        value: []
+      },
       _instance: {
         type: Object,
         computed: '_templatize(template)'
@@ -46,6 +51,7 @@
       }
 
       var instance = this.stamp();
+      this._instances.push(instance);
 
       Polymer.dom(this).appendChild(instance.root);
 
@@ -111,9 +117,12 @@
     },
 
     _forwardParentProp: function(prop, value) {
-      if (this._instance) {
-        this._instance[prop] = value;
-      }
+      // TODO: Bug in Polymer, seems to two-way bind any parent property only
+      // to the last template instance created. We need to push the property
+      // to all instances manually.
+      this._instances.forEach(function(inst) {
+        inst[prop] = value;
+      });
     },
 
     _forwardInstanceProp: function(inst, prop, value) {
