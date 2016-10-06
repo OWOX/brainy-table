@@ -74,6 +74,45 @@
           </template>
         </template>
       </demo-snippet>
+      <h4>Two-way binding support</h4>
+      <demo-snippet>
+        <template>
+          <template is="dom-bind">
+            <style is="custom-style">
+              :root {
+                --paper-input-container: {
+                  font-size: inherit;
+                }
+              }
+
+              .foo {
+                margin-bottom: 10px;
+              }
+            </style>
+            <iron-ajax auto url="users.json" last-response="{{users}}"></iron-ajax>
+
+            <paper-input class="foo" no-label-float label="Foo" value="{{foo}}"></paper-input>
+            <brainy-table items="[[users.data]]">
+              <brainy-table-column name="#" flex="0" width="50px">
+                <template>[[index]]</template>
+              </brainy-table-column>
+              <brainy-table-column name="First Name">
+                <template>
+                  <paper-input no-label-float value="{{item.user.name.first}}"></paper-input>
+                </template>
+              </brainy-table-column>
+              <brainy-table-column name="First Name Also">
+                <template>[[item.user.name.first]]</template>
+              </brainy-table-column>
+              <brainy-table-column name="Foo">
+                <template>
+                  <paper-input no-label-float value="{{foo}}"></paper-input>
+                </template>
+              </brainy-table-column>
+            </brainy-table>
+          </template>
+        </template>
+      </demo-snippet>
     </div>
     <div tab="filtering">
       <h4>Filtering</h4>
@@ -165,9 +204,16 @@
       <demo-snippet>
         <template>
           <template is="dom-bind">
+            <style is="custom-style">
+              .expandable brainy-tr[expanded] {
+                margin: 10px 0;
+
+                @apply(--shadow-elevation-3dp);
+              }
+            </style>
             <iron-ajax auto url="users.json" last-response="{{users}}"></iron-ajax>
 
-            <brainy-table details-enabled items="[[users.data]]">
+            <brainy-table class="expandable" details-enabled items="[[users.data]]">
               <brainy-table-column name="First Name">
                 <template>[[item.user.name.first]]</template>
               </brainy-table-column>
@@ -250,7 +296,7 @@
       </demo-snippet>
     </div>
     <div tab="scroll">
-      <h4>Drag and drop scroll, scrolling shadows, custom webkit scroll</h4>
+      <h4>Full effects: drag and drop, shadows, custom scroll bar</h4>
       <demo-snippet>
         <template>
           <template is="dom-bind">
@@ -276,7 +322,7 @@
           </template>
         </template>
       </demo-snippet>
-      <h4>No scrolling shadows, no custom webkit scroll</h4>
+      <h4>No effects: just a native scroll</h4>
       <demo-snippet>
         <template>
           <template is="dom-bind">
