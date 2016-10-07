@@ -2,16 +2,19 @@
   <template>
     <style>
       :host {
+        box-sizing: border-box;
         display: flex;
         flex-direction: column;
         background: #fff;
+        margin-top: -1px;
+        border-top: 1px solid #e3e3e3;
         border-bottom: 1px solid #e3e3e3;
 
         @apply(--brainy-tr);
       }
 
       :host([header]) {
-        border-top: 1px solid #e3e3e3;
+        margin: 0;
       }
 
       :host(:not([header])[even]) {
