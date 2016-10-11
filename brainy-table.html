@@ -111,13 +111,13 @@ Custom property                          | Description                          
         user-select: none;
       }
 
-      :host:not([no-custom-scroll]) #wrapper::-webkit-scrollbar-thumb {
+      :host(:not([no-custom-scroll])) #wrapper::-webkit-scrollbar-thumb {
         background: #a1a0a0;
 
         @apply(--brainy-table-webkit-scrollbar-thumb);
       }
 
-      :host:not([no-custom-scroll]) #wrapper::-webkit-scrollbar {
+      :host(:not([no-custom-scroll])) #wrapper::-webkit-scrollbar {
         width: 6px;
         height: 6px;
 
