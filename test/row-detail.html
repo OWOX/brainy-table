@@ -1,0 +1,174 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <script src="../../webcomponentsjs/webcomponents-lite.js"></script>
+  <script src="../../web-component-tester/browser.js"></script>
+  <script src="../../test-fixture/test-fixture-mocha.js"></script>
+  <link rel="import" href="common.html">
+  <link rel="import" href="../../iron-test-helpers/iron-test-helpers.html">
+  <link rel="import" href="../brainy-table.html">
+  <link rel="import" href="../../paper-checkbox/paper-checkbox.html">
+</head>
+<body>
+  <test-fixture id="table">
+    <template>
+      <brainy-table details-enabled>
+        <brainy-table-column name="First Name">
+          <template>[[item.user.name.first]]</template>
+        </brainy-table-column>
+        <brainy-table-column name="Last Name">
+          <template>
+            <a href="#" id="link">[[item.user.name.last]]</a>
+          </template>
+        </brainy-table-column>
+        <template is="row-detail">[[item.user.email]]</template>
+      </brainy-table>
+    </template>
+  </test-fixture>
+
+  <test-fixture id="table2">
+    <template>
+      <brainy-table>
+        <brainy-table-column>
+          <template>
+            <paper-checkbox checked="{{expanded}}">Expand</paper-checkbox>
+          </template>
+        </brainy-table-column>
+        <brainy-table-column name="First Name">
+          <template>[[item.user.name.first]]</template>
+        </brainy-table-column>
+        <brainy-table-column name="Last Name">
+          <template>
+            <a href="#" id="link">[[item.user.name.last]]</a>
+          </template>
+        </brainy-table-column>
+        <template is="row-detail">[[item.user.email]]</template>
+      </brainy-table>
+    </template>
+  </test-fixture>
+
+  <script>
+    describe('Row Detail', function() {
+      var table;
+      var firstRow;
+
+      var getFirstRow = function(table) {
+        return Polymer.dom(table).querySelector('brainy-tr:not([header])');
+      };
+
+      var getFirstCell = function(table) {
+        return getFirstRow(table).querySelector('brainy-td');
+      };
+
+      describe('using details-enabled property', function() {
+        beforeEach(function(done) {
+          table = fixture('table');
+          Polymer.dom.flush();
+          table.items = window.users;
+          Polymer.Base.async(done, 200);
+        });
+
+        it('should show row detail when cell is clicked', function(done) {
+          firstRow = getFirstRow(table);
+          getFirstCell(table).click();
+
+          setTimeout(function() {
+            var rowDetail = firstRow.querySelector('brainy-tr-detail');
+            expect(rowDetail).to.not.equal(null);
+            expect(rowDetail.hidden).to.equal(false);
+            var columns = Polymer.dom(firstRow.root).querySelector('.cells');
+            expect(firstRow.clientHeight).to.equal(columns.clientHeight + rowDetail.clientHeight);
+            expect(firstRow.getAttribute('expanded')).to.not.equal(null);
+            done();
+          }, 50);
+        });
+
+        it('should not show row detail when row cell with a focusable element is clicked', function(done) {
+          firstRow = getFirstRow(table);
+
+          firstRow.querySelector('#link').click();
+          setTimeout(function() {
+            var rowDetail = firstRow.querySelector('brainy-tr-detail');
+            expect(!rowDetail || rowDetail.hidden).to.equal(true);
+            expect(firstRow.getAttribute('expanded')).to.equal(null);
+            done();
+          }, 50);
+        });
+
+        it('should fire `expanding-item` event', function(done) {
+          table.addEventListener('expanding-item', function() {
+            done();
+          });
+          getFirstCell(table).click();
+        });
+
+        it('should not expand when `expanding-item` is cancelled', function(done) {
+          table.addEventListener('expanding-item', function(e) {
+            e.preventDefault();
+            table.async(function() {
+              expect(table.expandedItems.length).to.equal(0);
+              done();
+            });
+          });
+          getFirstCell(table).click();
+        });
+
+        it('should fire `collapsing-item` event', function(done) {
+          getFirstCell(table).click();
+          table.addEventListener('collapsing-item', function() {
+            done();
+          });
+          getFirstCell(table).click();
+        });
+
+        it('should not collapse when `collapsing-item` is cancelled', function(done) {
+          getFirstCell(table).click();
+          table.addEventListener('collapsing-item', function(e) {
+            e.preventDefault();
+            table.async(function() {
+              expect(table.expandedItems).to.have.members([table.items[0]]);
+              done();
+            });
+          });
+          getFirstCell(table).click();
+        });
+      });
+
+      describe('using expanded property in column template model', function() {
+        beforeEach(function(done) {
+          table = fixture('table2');
+          Polymer.dom.flush();
+          table.items = window.users;
+          Polymer.Base.async(done, 200);
+        });
+
+        it('should not show row detail when row is clicked', function(done) {
+          firstRow = getFirstRow(table);
+          getFirstCell(table).click();
+          setTimeout(function() {
+            var rowDetail = firstRow.querySelector('brainy-tr-detail');
+            expect(!rowDetail || rowDetail.hidden).to.equal(true);
+            expect(firstRow.getAttribute('expanded')).to.equal(null);
+            done();
+          }, 50);
+        });
+
+        it('should show row detail when row cell with expanded property bound is activated', function(done) {
+          firstRow = getFirstRow(table);
+          firstRow.querySelector('paper-checkbox').click();
+          setTimeout(function() {
+            var rowDetail = firstRow.querySelector('brainy-tr-detail');
+            expect(rowDetail).to.not.equal(null);
+            expect(rowDetail.hidden).to.equal(false);
+            var columns = Polymer.dom(firstRow.root).querySelector('.cells');
+            expect(firstRow.clientHeight).to.equal(columns.clientHeight + rowDetail.clientHeight);
+            expect(firstRow.getAttribute('expanded')).to.not.equal(null);
+            done();
+          }, 50);
+        });
+      });
+    });
+  </script>
+</body>
+</html>
