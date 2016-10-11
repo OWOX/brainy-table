@@ -1,0 +1,116 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <script src="../../webcomponentsjs/webcomponents-lite.js"></script>
+  <script src="../../web-component-tester/browser.js"></script>
+  <script src="../../test-fixture/test-fixture-mocha.js"></script>
+  <link rel="import" href="common.html">
+  <link rel="import" href="../../iron-test-helpers/iron-test-helpers.html">
+  <link rel="import" href="../brainy-table.html">
+</head>
+<body>
+  <test-fixture id="table">
+    <template>
+      <brainy-table>
+        <brainy-table-column name="First Name" sort-by="user.name.first">
+          <template>[[item.user.name.first]]</template>
+        </brainy-table-column>
+        <brainy-table-column name="Last Name" sort-by="user.name.last">
+          <template>[[item.user.name.last]]</template>
+        </brainy-table-column>
+        <brainy-table-column name="Email">
+          <template>[[item.user.email]]</template>
+        </brainy-table-column>
+      </brainy-table>
+    </template>
+  </test-fixture>
+
+  <script>
+    describe('Sorting', function() {
+      var table;
+
+      beforeEach(function(done) {
+        table = fixture('table');
+        Polymer.dom.flush();
+        table.items = window.users;
+        Polymer.Base.async(done);
+      });
+
+      var getFirstCellText = function() {
+        var row = Polymer.dom(table).querySelector('brainy-tr:not([header])');
+        return row.querySelector('brainy-td').textContent.trim();
+      };
+
+      var columnSortElement = function(index) {
+        var headerCells = Polymer.dom(table).querySelectorAll('brainy-td[header]');
+        return headerCells[index].querySelector('brainy-table-column-sort');
+      };
+
+      describe('using sorting icon', function() {
+        it('should show sorting icon only for columns with sort property', function() {
+          expect(columnSortElement(0).hidden).to.equal(false);
+          expect(columnSortElement(1).hidden).to.equal(false);
+          expect(columnSortElement(2).hidden).to.equal(true);
+        });
+
+        it('should activate sorting on tap', function() {
+          var icon = columnSortElement(0).$.icon;
+          window.MockInteractions.tap(icon);
+          expect(columnSortElement(0).hasAttribute('direction')).to.equal(true);
+        });
+
+        it('should change sorting direction on tap', function() {
+          var columnSort = columnSortElement(0);
+          window.MockInteractions.tap(columnSort.$.icon);
+          expect(columnSort.direction).to.eql('asc');
+        });
+
+        it('should sort items ascending on tap', function() {
+          var columnSort = columnSortElement(0);
+          window.MockInteractions.tap(columnSort.$.icon);
+          console.log(table.sortOrder[0]);
+          expect(table.sortOrder[0]).to.eql({
+            path: 'user.name.first',
+            direction: 'asc'
+          });
+        });
+
+        it('should sort items descending on double tap', function() {
+          var columnSort = columnSortElement(0);
+          window.MockInteractions.tap(columnSort.$.icon);
+          window.MockInteractions.tap(columnSort.$.icon);
+          expect(table.sortOrder[0]).to.eql({
+            path: 'user.name.first',
+            direction: 'desc'
+          });
+        });
+      });
+
+      describe('using sortOrder property', function() {
+        it('should sort items ascending', function(done) {
+          table.push('sortOrder', {path: 'user.name.first', direction: 'asc'});
+          table.async(function() {
+            expect(getFirstCellText()).to.equal('katie');
+            done();
+          }, 100);
+        });
+
+        it('should sort items descending', function(done) {
+          table.push('sortOrder', {path: 'user.name.first', direction: 'desc'});
+          table.async(function() {
+            expect(getFirstCellText()).to.equal('samuel');
+            done();
+          }, 100);
+        });
+
+        it('should update sorting icon', function() {
+          table.push('sortOrder', {path: 'user.name.last', direction: 'desc'});
+          var columnSort = columnSortElement(1);
+          expect(columnSort.getAttribute('direction')).to.eql('desc');
+        });
+      });
+    });
+  </script>
+</body>
+</html>
