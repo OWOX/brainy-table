@@ -1,10 +1,10 @@
 [![Build Status](https://travis-ci.org/web-padawan/brainy-table.svg?branch=master)](https://travis-ci.org/web-padawan/brainy-table)
 
+_[Demo and API docs](http://web-padawan.github.io/brainy-table/)_
+
 # &lt;brainy-table&gt;
 
 `brainy-table` is a Polymer 1.x data table element.
-
-[Demo and API Docs](http://web-padawan.github.io/brainy-table/)
 
 Inspired by [iron-data-table](https://github.com/Saulis/iron-data-table).
 Follows the guidelines of [Material Design](https://material.google.com/components/data-tables.html).
