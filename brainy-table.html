@@ -422,11 +422,8 @@ Custom property                          | Description                          
           return length - index === 1;
         },
 
-        _resizeCellContainers: function() {
+        _checkScroll: function() {
           var wrapper = this.$.wrapper;
-          var width = Math.min(wrapper.scrollWidth, wrapper.clientWidth + wrapper.scrollLeft) + 'px';
-          this.$.container.style.width = width;
-          this.$.header.style.width = width;
           if (!this.noScrollShadows) {
             this.toggleClass('left-shadow', wrapper.scrollLeft > 0, wrapper);
             this.toggleClass('right-shadow', wrapper.scrollLeft + wrapper.clientWidth < wrapper.scrollWidth, wrapper);
@@ -437,14 +434,11 @@ Custom property                          | Description                          
         },
 
         _onResize: function() {
-          // reset width first to make the cells and scroll width to reset their widths.
-          this.$.container.style.width = '';
-          this.$.header.style.width = '';
-          this.async(this._resizeCellContainers);
+          this.async(this._checkScroll);
         },
 
         _onHorizontalScroll: function() {
-          this.debounce('scrolling', this._resizeCellContainers);
+          this.debounce('scrolling', this._checkScroll);
         },
 
         _sortDirectionChanged: function(e) {
