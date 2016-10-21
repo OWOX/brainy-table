@@ -16,7 +16,6 @@ Follows the guidelines of [Material Design](https://material.google.com/componen
 ### Features
 - Data filtering
 - Data sorting
-- Multi-column sorting
 - Template support for each column
 - Two-way binding support
 - Custom styling support for templates
@@ -25,6 +24,13 @@ Follows the guidelines of [Material Design](https://material.google.com/componen
 - Column manipulation, resizing, hiding, reordering
 - Custom header templates
 - Row details
+- Horizontal scrolling shadows
+- "Drag-and-drop" scroll
+
+### Special use cases
+- Limited amount of data (for infinite scrolling, consider using `iron-data-table` instead)
+- Table shouldn't be explicitly sized (height depends on rows count)
+- Rows can include dropdown menus etc (no `transform` is used, so table does not create `z-index` trap)
 
 
 ### Styling
