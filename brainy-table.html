@@ -324,10 +324,6 @@ Custom property                          | Description                          
           'iron-resize': '_onResize'
         },
 
-        observers: [
-          '_renderOnChange(items.*)'
-        ],
-
         created: function() {
           this._observer = Polymer.dom(this).observeNodes(function(info) {
             var hasColumns = function(node) {
@@ -432,6 +428,11 @@ Custom property                          | Description                          
 
         _checkScroll: function() {
           var wrapper = this.$.wrapper;
+          var width = Math.min(wrapper.scrollWidth, wrapper.clientWidth + wrapper.scrollLeft);
+          if (width > 0) {
+            this.$.header.style.width = width + 'px';
+            this.$.container.style.width = width + 'px';
+          }
           if (!this.noScrollShadows) {
             this.toggleClass('left-shadow', wrapper.scrollLeft > 0, wrapper);
             this.toggleClass('right-shadow', wrapper.scrollLeft + wrapper.clientWidth < wrapper.scrollWidth, wrapper);
@@ -541,10 +542,6 @@ Custom property                          | Description                          
               this.set('items.' + index + '.' + e.detail.path, e.detail.value);
             }
           }
-        },
-
-        _renderOnChange: function() {
-          this.debounce('render', this.render);
         },
 
         /**
