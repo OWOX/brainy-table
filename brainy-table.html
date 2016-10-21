@@ -459,6 +459,7 @@ Custom property                          | Description                          
         },
 
         _computeSort: function(path, direction) {
+          var sort;
           var _compare = function(a, b) {
             if (a < b) {
               return -1;
@@ -470,9 +471,9 @@ Custom property                          | Description                          
           };
 
           if (direction === null) {
-            return null;
+            sort = null;
           } else {
-            return function(a, b) {
+            sort = function(a, b) {
               if (direction === 'asc') {
                 return _compare(Polymer.Base.get(path, a), Polymer.Base.get(path, b));
               } else if (direction === 'desc') {
@@ -481,6 +482,7 @@ Custom property                          | Description                          
               return 0;
             };
           }
+          return sort;
         },
 
         _computeFilter: function(change) {

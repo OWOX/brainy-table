@@ -84,12 +84,11 @@
           }
         },
 
-
         observers: [
           '_onSortChanged(sortPath, sortDirection)'
         ],
 
-        _onSortChanged: function (path, direction) {
+        _onSortChanged: function(path, direction) {
           // reset when sorting by other column
           if (path === this.path) {
             this.direction = direction;
