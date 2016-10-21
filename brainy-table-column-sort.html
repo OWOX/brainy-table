@@ -76,38 +76,25 @@
             notify: true
           },
           path: String,
-          order: {
-            type: Number,
-            computed: '_order(path, sortOrder, sortOrder.length)'
+          sortPath: {
+            type: String
           },
-          sortOrder: Array
+          sortDirection: {
+            type: String
+          }
         },
+
 
         observers: [
-          '_sortOrderChanged(sortOrder.*)'
+          '_onSortChanged(sortPath, sortDirection)'
         ],
 
-        _order: function(path, sortOrder, length) {
-          if (length <= 1) {
-            return '';
-          }
-
-          for (var i = 0; i < length; i++) {
-            if (sortOrder[i].path === path) {
-              return i + 1;
-            }
-          }
-        },
-
-        _sortOrderChanged: function(sortOrder) {
-          // TODO: if sortOrder for this column has been removed from outside, direction is not updated.
-          if (sortOrder.base) {
-            sortOrder.base.forEach(function(sort) {
-              if (sort.path === this.path) {
-                this.direction = sort.direction;
-                return;
-              }
-            }.bind(this));
+        _onSortChanged: function (path, direction) {
+          // reset when sorting by other column
+          if (path === this.path) {
+            this.direction = direction;
+          } else {
+            this.direction = null;
           }
         },
 

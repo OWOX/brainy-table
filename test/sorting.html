@@ -69,27 +69,23 @@
         it('should sort items ascending on tap', function() {
           var columnSort = columnSortElement(0);
           window.MockInteractions.tap(columnSort.$.icon);
-          console.log(table.sortOrder[0]);
-          expect(table.sortOrder[0]).to.eql({
-            path: 'user.name.first',
-            direction: 'asc'
-          });
+          expect(table.sortPath).to.equal('user.name.first');
+          expect(table.sortDirection).to.equal('asc');
         });
 
         it('should sort items descending on double tap', function() {
           var columnSort = columnSortElement(0);
           window.MockInteractions.tap(columnSort.$.icon);
           window.MockInteractions.tap(columnSort.$.icon);
-          expect(table.sortOrder[0]).to.eql({
-            path: 'user.name.first',
-            direction: 'desc'
-          });
+          expect(table.sortPath).to.equal('user.name.first');
+          expect(table.sortDirection).to.equal('desc');
         });
       });
 
       describe('using sortOrder property', function() {
         it('should sort items ascending', function(done) {
-          table.push('sortOrder', {path: 'user.name.first', direction: 'asc'});
+          table.sortPath = 'user.name.first';
+          table.sortDirection = 'asc';
           table.async(function() {
             expect(getFirstCellText()).to.equal('katie');
             done();
@@ -97,7 +93,8 @@
         });
 
         it('should sort items descending', function(done) {
-          table.push('sortOrder', {path: 'user.name.first', direction: 'desc'});
+          table.sortPath = 'user.name.first';
+          table.sortDirection = 'desc';
           table.async(function() {
             expect(getFirstCellText()).to.equal('samuel');
             done();
@@ -105,9 +102,12 @@
         });
 
         it('should update sorting icon', function() {
-          table.push('sortOrder', {path: 'user.name.last', direction: 'desc'});
+          table.sortPath = 'user.name.first';
+          table.sortDirection = 'desc';
           var columnSort = columnSortElement(1);
-          expect(columnSort.getAttribute('direction')).to.eql('desc');
+          table.async(function() {
+            expect(columnSort.getAttribute('direction')).to.eql('desc');
+          }, 100);
         });
       });
     });

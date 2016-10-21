@@ -12,7 +12,6 @@ Follows the guidelines of [Material Design](https://material.google.com/componen
 ## Features
 - Data filtering
 - Data sorting
-- Multi-column sorting
 - Template support for each column
 - Two-way binding support
 - Custom styling support for templates
