@@ -2,6 +2,7 @@
   "extends": "google",
   "plugins": [ "html" ],
   "rules":  {
+    "linebreak-style": "off",
     "new-cap": ["error", {
       "capIsNewExceptions": ["Polymer"],
       "newIsCapExceptionPattern": "this.ctor"

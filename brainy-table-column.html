@@ -8,7 +8,7 @@
         value="{{column.filterValue}}"
         hidden$="[[!column.filterBy]]"
       ></brainy-table-column-filter>
-      <div hidden$="[[column.filterBy]]">[[column.name]]</div>
+      <div sort-trigger hidden$="[[column.filterBy]]">[[column.name]]</div>
     </template>
   </template>
   <script>
@@ -85,7 +85,8 @@
            * indicator will be automatically placed in the header cell of this column.
            */
           sortBy: {
-            type: String
+            type: String,
+            value: null
           },
 
           /*

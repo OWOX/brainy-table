@@ -1,9 +1,11 @@
 <link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../iron-icon/iron-icon.html">
 <link rel="import" href="../iron-resizable-behavior/iron-resizable-behavior.html">
 
 <link rel="import" href="brainy-table-column.html">
-<link rel="import" href="brainy-table-column-sort.html">
+<link rel="import" href="brainy-table-icons.html">
 <link rel="import" href="brainy-td.html">
+<link rel="import" href="brainy-th.html">
 <link rel="import" href="brainy-tr.html">
 <link rel="import" href="brainy-tr-detail.html">
 
@@ -135,7 +137,7 @@ Custom property                          | Description                          
       <div id="header">
         <brainy-tr header>
           <template is="dom-repeat" items="[[columns]]" as="column">
-            <brainy-td
+            <brainy-th
               header
               align-right="[[column.alignRight]]"
               column="[[column]]"
@@ -145,15 +147,18 @@ Custom property                          | Description                          
               table="[[_this]]"
               template="[[column.headerTemplate]]"
               width="[[column.width]]"
+              sort-by="[[column.sortBy]]"
+              current-sort-path="[[sortPath]]"
+              current-sort-direction="[[sortDirection]]"
+              on-sort-direction-changed="_sortDirectionChanged"
             >
-              <brainy-table-column-sort
-                path="[[column.sortBy]]"
-                sort-path="[[sortPath]]"
-                sort-direction="[[sortDirection]]"
-                on-sort-direction-changed="_sortDirectionChanged"
+              <iron-icon
                 hidden$="[[!column.sortBy]]"
-              ></brainy-table-column-sort>
-            </brainy-td>
+                icon="brainy-table:arrow-upward"
+                direction$="[[direction]]"
+                sort-trigger
+              ></iron-icon>
+            </brainy-th>
           </template>
         </brainy-tr>
       </div>
