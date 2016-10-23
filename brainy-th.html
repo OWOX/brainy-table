@@ -8,17 +8,10 @@
     <style include="brainy-table-cell-shared-styles">
       :host {
         height: 56px;
+        position: relative;
         overflow: hidden;
         font: 600 12px/1.1 Roboto, sans-serif;
         color: rgba(0, 0, 0, 0.54);
-      }
-
-      :host .th-content {
-        position: relative;
-        display: flex;
-        align-items: center;
-        height: 100%;
-        padding: 0 24px;
       }
 
       :host([sort-by]) {
@@ -42,7 +35,6 @@
 
       :host ::content iron-icon[sort-trigger]:hover {
         fill: var(--default-primary-color);
-        cursor: pointer;
       }
 
       :host([direction='desc']) ::content iron-icon[sort-trigger] {
@@ -63,11 +55,8 @@
         left: -16px;
       }
     </style>
-    <div class="th-content" sort-trigger on-tap="_onTap">
-      <paper-ripple id="ripple" noink></paper-ripple>
-      <content select="iron-icon[sort-trigger]"></content>
-      <content></content>
-    </div>
+    <paper-ripple id="ripple" noink></paper-ripple>
+    <content></content>
   </template>
   <script>
     (function() {
@@ -94,6 +83,10 @@
           }
         },
 
+        listeners: {
+          tap: '_onTap'
+        },
+
         observers: [
           '_sortChanged(currentSortPath, currentSortDirection)'
         ],
@@ -110,7 +103,7 @@
         _onTap: function(event) {
           // prevent sorting when click on filter input etc.
           var target = Polymer.dom(event).rootTarget;
-          if (this.sortBy && target.hasAttribute('sort-trigger')) {
+          if (this.sortBy && (target === this || target.hasAttribute('sort-trigger'))) {
             this._sort();
           }
         },
