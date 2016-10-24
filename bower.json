@@ -1,11 +1,17 @@
 {
   "name": "brainy-table",
-  "version": "1.0.2",
+  "version": "1.1.0",
   "authors": [
     "Sergey Kulikov <serguey.kulikov@gmail.com>"
   ],
   "description": "brainy-table is a Polymer 1.x data table web component",
   "keywords": [
+    "table",
+    "datatable",
+    "data-table",
+    "datagrid",
+    "data-grid",
+    "grid",
     "web-components",
     "web components",
     "webcomponents",
@@ -13,13 +19,7 @@
     "web component",
     "webcomponent",
     "polymer",
-    "brainy",
-    "table",
-    "datatable",
-    "data-table",
-    "datagrid",
-    "data-grid",
-    "grid"
+    "brainy"
   ],
   "main": "brainy-table.html",
   "moduleType": [],
