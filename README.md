@@ -1,6 +1,7 @@
 [![Build Status](https://travis-ci.org/web-padawan/brainy-table.svg?branch=master)](https://travis-ci.org/web-padawan/brainy-table)
+[![Published on webcomponents.org](https://img.shields.io/badge/webcomponents.org-published-blue.svg)](https://beta.webcomponents.org/element/web-padawan/brainy-table)
 
-_[Demo and API docs](http://web-padawan.github.io/brainy-table/)_
+_[Demo and API docs](http://kulikov.pp.ua/brainy-table/)_
 
 # &lt;brainy-table&gt;
 
