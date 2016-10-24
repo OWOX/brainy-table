@@ -185,10 +185,10 @@
             <iron-ajax auto url="users.json" last-response="{{users}}"></iron-ajax>
 
             <brainy-table items="[[users.data]]">
-              <brainy-table-column name="First Name" sort-by="user.name.first">
+              <brainy-table-column name="First Name" filter-by="user.name.first" sort-by="user.name.first">
                 <template>[[item.user.name.first]]</template>
               </brainy-table-column>
-              <brainy-table-column name="Last Name" sort-by="user.name.last">
+              <brainy-table-column name="Last Name" sort-by="user.name.last" align-right>
                 <template>[[item.user.name.last]]</template>
               </brainy-table-column>
               <brainy-table-column name="Email">

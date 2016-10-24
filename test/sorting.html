@@ -42,9 +42,12 @@
         return row.querySelector('brainy-td').textContent.trim();
       };
 
+      var columnHeader = function(index) {
+        return Polymer.dom(table).querySelectorAll('brainy-th')[index];
+      };
+
       var columnSortElement = function(index) {
-        var headerCells = Polymer.dom(table).querySelectorAll('brainy-td[header]');
-        return headerCells[index].querySelector('brainy-table-column-sort');
+        return Polymer.dom(columnHeader(index)).querySelector('iron-icon[sort-trigger]');
       };
 
       describe('using sorting icon', function() {
@@ -55,28 +58,25 @@
         });
 
         it('should activate sorting on tap', function() {
-          var icon = columnSortElement(0).$.icon;
-          window.MockInteractions.tap(icon);
-          expect(columnSortElement(0).hasAttribute('direction')).to.equal(true);
+          window.MockInteractions.tap(columnSortElement(0));
+          expect(columnHeader(0).hasAttribute('direction')).to.equal(true);
         });
 
         it('should change sorting direction on tap', function() {
-          var columnSort = columnSortElement(0);
-          window.MockInteractions.tap(columnSort.$.icon);
-          expect(columnSort.direction).to.eql('asc');
+          window.MockInteractions.tap(columnSortElement(0));
+          expect(columnHeader(0).direction).to.eql('asc');
         });
 
         it('should sort items ascending on tap', function() {
-          var columnSort = columnSortElement(0);
-          window.MockInteractions.tap(columnSort.$.icon);
+          window.MockInteractions.tap(columnSortElement(0));
           expect(table.sortPath).to.equal('user.name.first');
           expect(table.sortDirection).to.equal('asc');
         });
 
         it('should sort items descending on double tap', function() {
           var columnSort = columnSortElement(0);
-          window.MockInteractions.tap(columnSort.$.icon);
-          window.MockInteractions.tap(columnSort.$.icon);
+          window.MockInteractions.tap(columnSort);
+          window.MockInteractions.tap(columnSort);
           expect(table.sortPath).to.equal('user.name.first');
           expect(table.sortDirection).to.equal('desc');
         });

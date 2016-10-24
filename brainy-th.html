@@ -1,0 +1,136 @@
+<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../paper-ripple/paper-ripple.html">
+<link rel="import" href="brainy-table-cell-behavior.html">
+<link rel="import" href="brainy-table-cell-shared-styles.html">
+
+<dom-module id="brainy-th">
+  <template>
+    <style include="brainy-table-cell-shared-styles">
+      :host {
+        height: 56px;
+        position: relative;
+        overflow: hidden;
+        font: 600 12px/1.1 Roboto, sans-serif;
+        color: rgba(0, 0, 0, 0.54);
+      }
+
+      :host([sort-by]) {
+        cursor: pointer;
+      }
+
+      :host ::content iron-icon[sort-trigger] {
+        width: 16px;
+        height: 16px;
+        fill: rgba(0, 0, 0, 0.87);
+        transition: transform 0.25s;
+      }
+
+      :host([direction]) ::content iron-icon[sort-trigger] ~ * {
+        color: rgba(0, 0, 0, 0.87);
+      }
+
+      :host(:not([direction])) ::content iron-icon[sort-trigger] {
+        fill: rgba(0, 0, 0, 0.38);
+      }
+
+      :host ::content iron-icon[sort-trigger]:hover {
+        fill: var(--default-primary-color);
+      }
+
+      :host([direction='desc']) ::content iron-icon[sort-trigger] {
+        transform: rotate(-180deg);
+      }
+
+      :host ::content iron-icon[sort-trigger][hidden] {
+        display: none;
+      }
+
+      :host(:not([align-right])) ::content iron-icon[sort-trigger] {
+        position: relative;
+        left: -20px;
+      }
+
+      :host(:not([align-right])) ::content iron-icon[sort-trigger]:not([hidden]) ~ * {
+        position: relative;
+        left: -16px;
+      }
+    </style>
+    <paper-ripple id="ripple" noink></paper-ripple>
+    <content></content>
+  </template>
+  <script>
+    (function() {
+      'use strict';
+
+      Polymer({
+        is: 'brainy-th',
+
+        behaviors: [
+          Brainy.TableCellBehavior
+        ],
+
+        properties: {
+          currentSortPath: String,
+          currentSortDirection: String,
+          direction: {
+            type: String,
+            reflectToAttribute: true
+          },
+          sortBy: {
+            type: String,
+            value: null,
+            reflectToAttribute: true
+          }
+        },
+
+        listeners: {
+          tap: '_onTap'
+        },
+
+        observers: [
+          '_sortChanged(currentSortPath, currentSortDirection)'
+        ],
+
+        _sortChanged: function(path, direction) {
+          // reset when sorting by other column
+          if (path === this.sortBy) {
+            this.direction = direction;
+          } else {
+            this.direction = null;
+          }
+        },
+
+        _onTap: function(event) {
+          // prevent sorting when click on filter input etc.
+          var target = Polymer.dom(event).rootTarget;
+          if (this.sortBy && (target === this || target.hasAttribute('sort-trigger'))) {
+            this._sort();
+          }
+        },
+
+        _sort: function() {
+          switch (this.direction) {
+            case 'asc':
+              this.direction = 'desc';
+              break;
+
+            case 'desc':
+              this.direction = null;
+              break;
+
+            default:
+              this.direction = 'asc';
+              break;
+          }
+
+          this.fire('sort-direction-changed', {
+            path: this.sortBy,
+            direction: this.direction
+          });
+
+          this.$.ripple.simulatedRipple();
+        }
+      });
+    })();
+  </script>
+</dom-module>

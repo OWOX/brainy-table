@@ -1,0 +1,26 @@
+<dom-module id="brainy-table-cell-shared-styles">
+  <template>
+    <style>
+      :host {
+        flex: 1 0 100px;
+        display: flex;
+        padding: 0 24px;
+        overflow: hidden;
+        align-items: center;
+        -webkit-font-smoothing: antialiased;
+      }
+
+      :host(:first-of-type) {
+        border-left: 1px solid #e3e3e3;
+      }
+
+      :host(:last-of-type) {
+        border-right: 1px solid #e3e3e3;
+      }
+
+      :host([hidden]) {
+        display: none;
+      }
+    </style>
+  </template>
+</dom-module>
