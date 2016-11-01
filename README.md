@@ -8,6 +8,37 @@ _[Demo and API docs](http://kulikov.pp.ua/brainy-table/)_
 
 `brainy-table` is a Polymer 1.x data table element.
 
+<!--
+```
+<custom-element-demo>
+  <template>
+    <script src="../webcomponentsjs/webcomponents-lite.js"></script>
+    <link rel="import" href="../iron-ajax/iron-ajax.html">
+    <link rel="import" href="brainy-table.html">
+    <div>
+      <template is="dom-bind">
+        <next-code-block></next-code-block>
+      </template>
+    </div>
+  </template>
+</custom-element-demo>
+```
+-->
+```
+  <iron-ajax auto url="demo/users.json" last-response="{{users}}"></iron-ajax>
+  <brainy-table items="[[users.data]]">
+    <brainy-table-column name="First Name" filter-by="user.name.first" sort-by="user.name.first">
+      <template>[[item.user.name.first]]</template>
+    </brainy-table-column>
+    <brainy-table-column name="Last Name" sort-by="user.name.last" align-right>
+      <template>[[item.user.name.last]]</template>
+    </brainy-table-column>
+    <brainy-table-column name="Email">
+      <template>[[item.user.email]]</template>
+    </brainy-table-column>
+  </brainy-table>
+```
+
 Inspired by [iron-data-table](https://github.com/Saulis/iron-data-table).
 Follows the guidelines of [Material Design](https://material.google.com/components/data-tables.html).
 
