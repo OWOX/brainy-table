@@ -24,7 +24,7 @@ _[Demo and API docs](http://kulikov.pp.ua/brainy-table/)_
 </custom-element-demo>
 ```
 -->
-```
+```html
   <iron-ajax auto url="demo/users.json" last-response="{{users}}"></iron-ajax>
   <brainy-table items="[[users.data]]">
     <brainy-table-column name="First Name" filter-by="user.name.first" sort-by="user.name.first">
