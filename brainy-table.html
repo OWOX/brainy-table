@@ -439,7 +439,7 @@ Custom property                          | Description                          
 
         _checkScroll: function() {
           var wrapper = this.$.wrapper;
-          var width = Math.min(wrapper.scrollWidth, wrapper.clientWidth + wrapper.scrollLeft);
+          var width = wrapper.scrollLeft ? wrapper.scrollWidth : wrapper.clientWidth;
           if (width > 0) {
             this.$.header.style.width = width + 'px';
             this.$.container.style.width = width + 'px';
