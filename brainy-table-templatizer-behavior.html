@@ -125,6 +125,15 @@
       });
     },
 
+    _forwardParentPath: function(path, value) {
+      // TODO: Bug in Polymer, seems to two-way bind any parent property only
+      // to the last template instance created. We need to push the property
+      // to all instances manually.
+      this._instances.forEach(function(inst) {
+        inst._notifyPath(path, value, true);
+      });
+    },
+
     _forwardInstanceProp: function(inst, prop, value) {
       if (prop === 'expanded' && inst.item && this._expanded !== value) {
         if (value) {
