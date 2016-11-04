@@ -17,7 +17,7 @@ _[Demo and API docs](http://kulikov.pp.ua/brainy-table/)_
     <link rel="import" href="../iron-icon/iron-icon.html">
     <link rel="import" href="../iron-icons/iron-icons.html">
     <link rel="import" href="brainy-table.html">
-    <div>
+    <div style="min-height: 400px;">
       <template is="dom-bind">
         <next-code-block></next-code-block>
       </template>
@@ -32,11 +32,11 @@ _[Demo and API docs](http://kulikov.pp.ua/brainy-table/)_
   <brainy-table-column name="First Name" filter-by="user.name.first" sort-by="user.name.first">
     <template>[[item.user.name.first]]</template>
   </brainy-table-column>
-  <brainy-table-column name="Last Name" sort-by="user.name.last" align-right>
+  <brainy-table-column name="Last Name" sort-by="user.name.last">
     <template>[[item.user.name.last]]</template>
   </brainy-table-column>
-  <brainy-table-column name="Email">
-    <template>[[item.user.email]]</template>
+  <brainy-table-column name="Phone" sort-by="user.phone" align-right>
+    <template>[[item.user.phone]]</template>
   </brainy-table-column>
   <brainy-table-column width="30px" align-right flex="0">
     <template>
