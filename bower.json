@@ -1,8 +1,8 @@
 {
   "name": "brainy-table",
-  "version": "1.1.4",
+  "version": "1.2.0",
   "authors": [
-    "Sergey Kulikov <serguey.kulikov@gmail.com>"
+    "OWOX Inc."
   ],
   "description": "brainy-table is a Polymer 1.x data table web component",
   "keywords": [
