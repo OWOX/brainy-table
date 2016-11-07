@@ -261,6 +261,15 @@ Custom property                          | Description                          
           },
 
           /**
+           * If `true`, string comparision when sorting will be case sensitive.
+           * Otherwise, both strings will be converted to lower case when comparing.
+           */
+          sortCaseSensitive: {
+            type: Boolean,
+            value: false
+          },
+
+          /**
            * A string indicating property used to sort.
            */
           sortPath: {
@@ -472,7 +481,13 @@ Custom property                          | Description                          
 
         _computeSort: function(path, direction) {
           var sort;
+          var table = this;
           var _compare = function(a, b) {
+            // string comparision
+            if (typeof a === 'string' && typeof b === 'string' && !table.sortCaseSensitive) {
+              a = a.toLowerCase();
+              b = b.toLowerCase();
+            }
             if (a < b) {
               return -1;
             }

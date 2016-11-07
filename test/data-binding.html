@@ -42,7 +42,7 @@
           var newItem = {user: {name: {first: 'foo'}}};
           table.push('items', newItem);
           table.async(function() {
-            expect(getFirstCellText(table, 2)).to.equal('foo');
+            expect(getFirstCellText(table, 3)).to.equal('foo');
             done();
           }, 200);
         });
