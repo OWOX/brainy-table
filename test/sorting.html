@@ -80,6 +80,13 @@
           expect(table.sortPath).to.equal('user.name.first');
           expect(table.sortDirection).to.equal('desc');
         });
+
+        it('should make sorting case-sensitive', function() {
+          table.sortCaseSensitive = true;
+          window.MockInteractions.tap(columnSortElement(0));
+          table.render();
+          expect(getFirstCellText()).to.equal('Katie');
+        });
       });
 
       describe('using sortOrder property', function() {
@@ -97,6 +104,16 @@
           table.sortDirection = 'desc';
           table.async(function() {
             expect(getFirstCellText()).to.equal('samuel');
+            done();
+          }, 100);
+        });
+
+        it('should make sorting case-sensitive', function(done) {
+          table.sortCaseSensitive = true;
+          table.sortPath = 'user.name.first';
+          table.sortDirection = 'asc';
+          table.async(function() {
+            expect(getFirstCellText()).to.equal('Katie');
             done();
           }, 100);
         });

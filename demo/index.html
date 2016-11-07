@@ -178,13 +178,33 @@
       </demo-snippet>
     </div>
     <div tab="sorting">
-      <h4>Sorting</h4>
+      <h4>Default sorting</h4>
       <demo-snippet>
         <template>
           <template is="dom-bind">
             <iron-ajax auto url="users.json" last-response="{{users}}"></iron-ajax>
 
             <brainy-table items="[[users.data]]">
+              <brainy-table-column name="First Name" filter-by="user.name.first" sort-by="user.name.first">
+                <template>[[item.user.name.first]]</template>
+              </brainy-table-column>
+              <brainy-table-column name="Last Name" sort-by="user.name.last" align-right>
+                <template>[[item.user.name.last]]</template>
+              </brainy-table-column>
+              <brainy-table-column name="Email">
+                <template>[[item.user.email]]</template>
+              </brainy-table-column>
+            </brainy-table>
+          </template>
+        </template>
+      </demo-snippet>
+      <h4>Case-sensitive string sorting (upper-case letters come first)</h4>
+      <demo-snippet>
+        <template>
+          <template is="dom-bind">
+            <iron-ajax auto url="users.json" last-response="{{users}}"></iron-ajax>
+
+            <brainy-table items="[[users.data]]" sort-case-sensitive>
               <brainy-table-column name="First Name" filter-by="user.name.first" sort-by="user.name.first">
                 <template>[[item.user.name.first]]</template>
               </brainy-table-column>
