@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/web-padawan/brainy-table.svg?branch=master)](https://travis-ci.org/OWOX/brainy-table)
+[![Build Status](https://travis-ci.org/OWOX/brainy-table.svg?branch=master)](https://travis-ci.org/OWOX/brainy-table)
 [![Bower version](https://badge.fury.io/bo/brainy-table.svg)](https://badge.fury.io/bo/brainy-table)
 [![Published on webcomponents.org](https://img.shields.io/badge/webcomponents.org-published-blue.svg)](https://beta.webcomponents.org/element/OWOX/brainy-table)
 
