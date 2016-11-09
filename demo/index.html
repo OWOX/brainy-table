@@ -291,7 +291,7 @@
           <template is="dom-bind">
             <iron-ajax auto url="users.json" last-response="{{users}}"></iron-ajax>
 
-            <brainy-table details-enabled items="[[users.data]]">
+            <brainy-table items="[[users.data]]">
               <brainy-table-column name="First Name">
                 <template>[[item.user.name.first]]</template>
               </brainy-table-column>
@@ -304,6 +304,35 @@
               <brainy-table-column flex="1" width="50px" align-right>
                 <template>
                   <paper-checkbox checked="{{expanded}}">Details</paper-checkbox>
+                </template>
+              </brainy-table-column>
+
+              <template is="row-detail">
+                <div>[[item.user.location.street]], [[item.user.location.city]], [[item.user.location.state]]</div>
+              </template>
+            </brainy-table>
+          </template>
+        </template>
+      </demo-snippet>
+      <h4>Disable details for particular rows</h4>
+      <demo-snippet>
+        <template>
+          <template is="dom-bind">
+            <iron-ajax auto url="users.json" last-response="{{users}}"></iron-ajax>
+
+            <brainy-table details-enabled items="[[users.data]]">
+              <brainy-table-column name="First Name">
+                <template>[[item.user.name.first]]</template>
+              </brainy-table-column>
+              <brainy-table-column name="Last Name">
+                <template>[[item.user.name.last]]</template>
+              </brainy-table-column>
+              <brainy-table-column name="Email">
+                <template>[[item.user.email]]</template>
+              </brainy-table-column>
+              <brainy-table-column flex="1" width="50px" align-right>
+                <template>
+                  <paper-checkbox checked="{{detailDisabled}}">Disable details</paper-checkbox>
                 </template>
               </brainy-table-column>
 

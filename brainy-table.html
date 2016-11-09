@@ -97,7 +97,7 @@ Custom property                          | Description                          
         background: var(--brainy-table-right-shadow-background, linear-gradient(to right, transparent, rgba(37, 37, 37, 0.3)));
       }
 
-      :host([details-enabled]) ::content brainy-tr:not([header]):hover {
+      :host([details-enabled]) ::content brainy-tr:not([header]):not([disable-detail]):hover {
         cursor: pointer;
 
         @apply(--brainy-table-details-enabled-tr-hover);
@@ -171,6 +171,7 @@ Custom property                          | Description                          
               first$="[[_isFirst(index)]]"
               last$="[[_isLast(index, items.length)]]"
               expanded="[[_isExpanded(item, expandedItems, expandedItems.*)]]"
+              disable-detail="[[_isExpanded(item, _disabledDetailItems, _disabledDetailItems.*)]]"
               index="[[index]]"
               item="[[item]]"
               tabindex="-1"
@@ -229,6 +230,16 @@ Custom property                          | Description                          
            */
           items: {
             type: Array
+          },
+
+          /**
+           * An array containing items for those row details are disabled (cannot be expanded).
+           */
+          _disabledDetailItems: {
+            type: Array,
+            value: function() {
+              return [];
+            }
           },
 
           /**
@@ -608,6 +619,18 @@ Custom property                          | Description                          
           return items && items.indexOf(item) > -1;
         },
 
+        _isDetailDisabled: function(item, items) {
+          return items.indexOf(item) > -1;
+        },
+
+        _disableItemDetail: function(item) {
+          this.push('_disabledDetailItems', item);
+        },
+
+        _enableItemDetail: function(item) {
+          this.splice('_disabledDetailItems', this._disabledDetailItems.indexOf(item), 1);
+        },
+
         _isFocusable: function(target) {
           var result;
           if (Polymer.Settings.useNativeShadow) {
@@ -644,6 +667,7 @@ Custom property                          | Description                          
         _onCellClick: function(e) {
           // Prevent row expanding if row itself is not focused. This means that an element inside the row has been focused.
           // Mobile devices don't move focus from body unless it's an input element that is focused, so this element will never get focused.
+          var target = e.model.item;
           if (this._isFocusable(Polymer.dom(e).localTarget) === false) {
             var fireEvent = function(eventName, item, defaultAction) {
               var e = this.fire(eventName, {item: item}, {cancelable: true});
@@ -652,11 +676,11 @@ Custom property                          | Description                          
               }
             }.bind(this);
 
-            if (this._rowDetail && this.detailsEnabled) {
-              if (this._isExpanded(e.model.item, this.expandedItems)) {
-                fireEvent('collapsing-item', e.model.item, this.collapseItem);
+            if (this._rowDetail && this.detailsEnabled && !this._isDetailDisabled(target, this._disabledDetailItems)) {
+              if (this._isExpanded(target, this.expandedItems)) {
+                fireEvent('collapsing-item', target, this.collapseItem);
               } else {
-                fireEvent('expanding-item', e.model.item, this.expandItem);
+                fireEvent('expanding-item', target, this.expandItem);
               }
             }
           } else {
