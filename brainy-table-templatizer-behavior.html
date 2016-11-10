@@ -150,7 +150,7 @@
           this.table.collapseItem(inst.item);
         }
       }
-      if (prop === 'detailDisabled' && inst.item) {
+      if (prop === 'detailDisabled' && inst.item && this.table) {
         if (value) {
           this.table._disableItemDetail(inst.item);
         } else {
