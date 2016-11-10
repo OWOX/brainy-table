@@ -14,6 +14,7 @@
           "state": "hawaii",
           "zip": 48371
         },
+        "private": false,
         "email": "donna.davis@example.com",
         "username": "whitebird347",
         "password": "salami",
@@ -47,6 +48,7 @@
           "state": "iowa",
           "zip": 46037
         },
+        "private": true,
         "email": "samuel.kelley@example.com",
         "username": "redmeercat301",
         "password": "word",
@@ -80,6 +82,7 @@
           "state": "georgia",
           "zip": 98900
         },
+        "private": true,
         "email": "katie.butler@example.com",
         "username": "beautifulladybug546",
         "password": "ontario",
@@ -113,6 +116,7 @@
           "state": "nebraska",
           "zip": 78220
         },
+        "private": false,
         "email": "bernard.mitchell@example.com",
         "username": "whiteleopard236",
         "password": "american",
@@ -146,6 +150,7 @@
           "state": "texas",
           "zip": 41573
         },
+        "private": false,
         "email": "amy.reynolds@example.com",
         "username": "greengorilla845",
         "password": "cezer121",
@@ -179,6 +184,7 @@
           "state": "delaware",
           "zip": 28437
         },
+        "private": false,
         "email": "darryl.caldwell@example.com",
         "username": "goldencat943",
         "password": "bean",
@@ -212,6 +218,7 @@
           "state": "idaho",
           "zip": 29068
         },
+        "private": true,
         "email": "phoebe.evans@example.com",
         "username": "lazypanda428",
         "password": "carver",
@@ -245,6 +252,7 @@
           "state": "indiana",
           "zip": 47123
         },
+        "private": false,
         "email": "sean.peterson@example.com",
         "username": "crazyelephant306",
         "password": "nong",
@@ -311,6 +319,7 @@
           "state": "michigan",
           "zip": 65614
         },
+        "private": false,
         "email": "julian.obrien@example.com",
         "username": "bigtiger177",
         "password": "swordfis",

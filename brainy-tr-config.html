@@ -1,0 +1,31 @@
+<dom-module id="brainy-tr-config">
+  <script>
+    (function() {
+      'use strict';
+
+      Polymer({
+        is: 'brainy-tr-config',
+
+        properties: {
+          detailDisabled: {
+            type: Boolean,
+            notify: true
+          },
+          shouldDisableDetail: {
+            type: Boolean,
+            observer: '_shouldDisableDetailChanged'
+          }
+        },
+
+        _shouldDisableDetailChanged: function(disabled) {
+          if (typeof disabled !== 'undefined') {
+            // async to prevent calls before first render completed
+            this.async(function() {
+              this.detailDisabled = disabled;
+            });
+          }
+        }
+      });
+    })();
+  </script>
+</dom-module>
