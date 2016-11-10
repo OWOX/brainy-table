@@ -19,7 +19,10 @@
 
         _shouldDisableDetailChanged: function(disabled) {
           if (typeof disabled !== 'undefined') {
-            this.detailDisabled = disabled;
+            // async to prevent calls before first render completed
+            this.async(function() {
+              this.detailDisabled = disabled;
+            });
           }
         }
       });

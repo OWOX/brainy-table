@@ -98,7 +98,7 @@ Custom property                          | Description                          
         background: var(--brainy-table-right-shadow-background, linear-gradient(to right, transparent, rgba(37, 37, 37, 0.3)));
       }
 
-      :host([details-enabled]) ::content brainy-tr:not([header]):not([disable-detail]):hover {
+      :host([details-enabled]) ::content brainy-tr:not([header]):not([detail-disabled]):hover {
         cursor: pointer;
 
         @apply(--brainy-table-details-enabled-tr-hover);
@@ -172,7 +172,7 @@ Custom property                          | Description                          
               first$="[[_isFirst(index)]]"
               last$="[[_isLast(index, items.length)]]"
               expanded="[[_isExpanded(item, expandedItems, expandedItems.*)]]"
-              disable-detail="[[_isExpanded(item, _disabledDetailItems, _disabledDetailItems.*)]]"
+              detail-disabled="[[_isDetailDisabled(item, _disabledItems, _disabledItems.*)]]"
               index="[[index]]"
               item="[[item]]"
               tabindex="-1"
@@ -184,6 +184,7 @@ Custom property                          | Description                          
                   align-right="[[column.alignRight]]"
                   column="[[column]]"
                   expanded="[[_isExpanded(item, expandedItems, expandedItems.*)]]"
+                  detail-disabled="[[_isDetailDisabled(item, _disabledItems, _disabledItems.*)]]"
                   flex="[[column.flex]]"
                   hidden="[[column.hidden]]"
                   index="[[index]]"
@@ -236,7 +237,7 @@ Custom property                          | Description                          
           /**
            * An array containing items for those row details are disabled (cannot be expanded).
            */
-          _disabledDetailItems: {
+          _disabledItems: {
             type: Array,
             value: function() {
               return [];
@@ -625,11 +626,11 @@ Custom property                          | Description                          
         },
 
         _disableItemDetail: function(item) {
-          this.push('_disabledDetailItems', item);
+          this.push('_disabledItems', item);
         },
 
         _enableItemDetail: function(item) {
-          this.splice('_disabledDetailItems', this._disabledDetailItems.indexOf(item), 1);
+          this.splice('_disabledItems', this._disabledItems.indexOf(item), 1);
         },
 
         _isFocusable: function(target) {
@@ -676,8 +677,7 @@ Custom property                          | Description                          
                 defaultAction.call(this, item);
               }
             }.bind(this);
-
-            if (this._rowDetail && this.detailsEnabled && !this._isDetailDisabled(target, this._disabledDetailItems)) {
+            if (this._rowDetail && this.detailsEnabled && !this._isDetailDisabled(target, this._disabledItems)) {
               if (this._isExpanded(target, this.expandedItems)) {
                 fireEvent('collapsing-item', target, this.collapseItem);
               } else {
