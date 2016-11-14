@@ -17,7 +17,7 @@ _[Demo and API docs](https://owox.github.io/brainy-table/)_
     <link rel="import" href="../iron-icon/iron-icon.html">
     <link rel="import" href="../iron-icons/iron-icons.html">
     <link rel="import" href="brainy-table.html">
-    <div style="min-height: 400px;">
+    <div>
       <template is="dom-bind">
         <next-code-block></next-code-block>
       </template>
