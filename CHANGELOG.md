@@ -1,7 +1,10 @@
 # Change Log
 
+## [1.3.1] - 2016-11-15
+- Call `notifyResize` after first rows render to fix appearance on Windows
+
 ## [1.3.0] - 2016-11-10
-- Allow disabling details for particular rows via `detailDisabled` bound property.
+- Allow disabling details for particular rows via `detailDisabled` bound property
 
 ## [1.2.0] - 2016-11-07
 - Make string sorting case-insensitive by default, add `sortCaseSensitive` option
