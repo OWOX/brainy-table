@@ -387,6 +387,12 @@ Custom property                          | Description                          
           }.bind(this));
         },
 
+        attached: function() {
+          Polymer.RenderStatus.afterNextRender(this.$.rows, function() {
+            this.notifyResize();
+          }.bind(this));
+        },
+
         _dragScrollableChanged: function(dragScrollable, oldDragScrollable) {
           var wrapper = this.$.wrapper;
           if (dragScrollable) {
