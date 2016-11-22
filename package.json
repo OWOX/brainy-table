@@ -14,13 +14,13 @@
     "stylelint": "^7.3.1",
     "stylelint-config-polymer": "^0.0.1",
     "stylelint-processor-html": "^1.0.0",
-    "web-component-tester": "^4.3.4"
+    "web-component-tester": "^5.0.0"
   },
   "scripts": {
     "lint:js": "eslint *.html **/*.html --ext .html",
     "lint:css": "stylelint **/*.html",
     "lint": "npm-run-all --parallel lint:*",
     "pretest": "npm run lint",
-    "test": "wct"
+    "test": "wct -l chrome,firefox"
   }
 }
