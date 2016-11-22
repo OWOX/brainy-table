@@ -1,0 +1,129 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <script src="../../webcomponentsjs/webcomponents-lite.js"></script>
+  <script src="../../web-component-tester/browser.js"></script>
+  <script src="../../test-fixture/test-fixture-mocha.js"></script>
+  <link rel="import" href="../brainy-table.html">
+</head>
+<body>
+<test-fixture id="table">
+  <template>
+    <brainy-table>
+      <brainy-table-column name="First" filter-by="value">
+        <template>[[item.value]]</template>
+      </brainy-table-column>
+      <brainy-table-column name="Second" filter-by="value2">
+        <template>[[item.value2]]</template>
+      </brainy-table-column>
+      <brainy-table-column name="Third">
+        <template>[[item.value]]</template>
+      </brainy-table-column>
+    </brainy-table>
+  </template>
+</test-fixture>
+
+<script>
+  describe('Filtering', function() {
+    var table;
+    var getRowCount = function(table) {
+      // exclude last child (dom-repeat)
+      return table.$.container.children.length - 1;
+    };
+
+    beforeEach(function(done) {
+      table = fixture('table');
+      Polymer.dom.flush();
+      table.items = [{
+        value: 'foo',
+        value2: 'fooz'
+      }, {
+        value: 'bar',
+        value2: 'bah'
+      }, {
+        value: 'qux',
+        value2: 'baz'
+      }];
+      Polymer.Base.async(done, 200);
+    });
+
+    describe('using filter-value property', function() {
+      it('should update `filters`', function() {
+        table.columns[0].filterValue = 'foo';
+        expect(table.filter[0].filter).to.eql('foo');
+      });
+      it('should filter with `false` value', function() {
+        table.columns[0].filterValue = false;
+        expect(table.filter[0].filter).to.eql(false);
+      });
+    });
+
+    describe('using `filter` property', function() {
+      it('should filter with `false` filter', function(done) {
+        table.push('filter', {filter: false, path: 'value'});
+        flush(function() {
+          expect(getRowCount(table)).to.eql(0);
+          done();
+        });
+      });
+      it('should not filter with empty string as filter', function(done) {
+        table.push('filter', {filter: '', path: 'value'});
+        flush(function() {
+          expect(getRowCount(table)).to.eql(3);
+          done();
+        });
+      });
+      it('should not filter out items with `undefined` value with empty filter', function(done) {
+        table.items[0].value = undefined;
+        table.push('filter', {filter: '', path: 'value'});
+        flush(function() {
+          expect(getRowCount(table)).to.eql(3);
+          done();
+        });
+      });
+      it('should not filter with `undefined` filter', function(done) {
+        table.push('filter', {filter: undefined, path: 'value'});
+        flush(function() {
+          expect(getRowCount(table)).to.eql(3);
+          done();
+        });
+      });
+      it('should not filter with `null` filter', function(done) {
+        table.push('filter', {filter: null, path: 'value'});
+        flush(function() {
+          expect(getRowCount(table)).to.eql(3);
+          done();
+        });
+      });
+      it('should filter items with `false` value', function(done) {
+        table.items[0].value = false;
+        table.push('filter', {filter: false, path: 'value'});
+        flush(function() {
+          expect(getRowCount(table)).to.eql(1);
+          done();
+        });
+      });
+      it('should filter out items with `null` value', function(done) {
+        table.items[0].value = 'foo';
+        table.items[1].value = null;
+        table.push('filter', {filter: 'foo', path: 'value'});
+        flush(function() {
+          expect(getRowCount(table)).to.eql(1);
+          done();
+        });
+      });
+      it('should filter out items with `undefined` value', function(done) {
+        table.items[0].value = 'foo';
+        table.items[1].value = undefined;
+        table.push('filter', {filter: 'foo', path: 'value'});
+        flush(function() {
+          expect(getRowCount(table)).to.eql(1);
+          done();
+        });
+      });
+    });
+  });
+</script>
+</body>
+</html>
