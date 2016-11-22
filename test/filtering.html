@@ -45,7 +45,7 @@
         value: 'qux',
         value2: 'baz'
       }];
-      Polymer.Base.async(done, 200);
+      Polymer.Base.async(done, 500);
     });
 
     describe('using filter-value property', function() {
@@ -62,65 +62,90 @@
     describe('using `filter` property', function() {
       it('should filter with `false` filter', function(done) {
         table.push('filter', {filter: false, path: 'value'});
-        flush(function() {
-          expect(getRowCount(table)).to.eql(0);
-          done();
+        table.addEventListener('table-rendered', function() {
+          flush(function() {
+            expect(getRowCount(table)).to.eql(0);
+            done();
+          });
         });
+        table.render();
       });
+
       it('should not filter with empty string as filter', function(done) {
         table.push('filter', {filter: '', path: 'value'});
-        flush(function() {
-          expect(getRowCount(table)).to.eql(3);
-          done();
+        table.addEventListener('table-rendered', function() {
+          flush(function() {
+            expect(getRowCount(table)).to.eql(3);
+            done();
+          });
         });
+        table.render();
       });
       it('should not filter out items with `undefined` value with empty filter', function(done) {
         table.items[0].value = undefined;
         table.push('filter', {filter: '', path: 'value'});
-        flush(function() {
-          expect(getRowCount(table)).to.eql(3);
-          done();
+        table.addEventListener('table-rendered', function() {
+          flush(function() {
+            expect(getRowCount(table)).to.eql(3);
+            done();
+          });
         });
+        table.render();
       });
       it('should not filter with `undefined` filter', function(done) {
         table.push('filter', {filter: undefined, path: 'value'});
-        flush(function() {
-          expect(getRowCount(table)).to.eql(3);
-          done();
+        table.addEventListener('table-rendered', function() {
+          flush(function() {
+            expect(getRowCount(table)).to.eql(3);
+            done();
+          });
         });
+        table.render();
       });
       it('should not filter with `null` filter', function(done) {
         table.push('filter', {filter: null, path: 'value'});
-        flush(function() {
-          expect(getRowCount(table)).to.eql(3);
-          done();
+        table.addEventListener('table-rendered', function() {
+          flush(function() {
+            expect(getRowCount(table)).to.eql(3);
+            done();
+          });
         });
+        table.render();
       });
       it('should filter items with `false` value', function(done) {
         table.items[0].value = false;
         table.push('filter', {filter: false, path: 'value'});
-        flush(function() {
-          expect(getRowCount(table)).to.eql(1);
-          done();
+        table.addEventListener('table-rendered', function() {
+          flush(function() {
+            expect(getRowCount(table)).to.eql(1);
+            done();
+          });
         });
+        table.render();
       });
       it('should filter out items with `null` value', function(done) {
         table.items[0].value = 'foo';
         table.items[1].value = null;
         table.push('filter', {filter: 'foo', path: 'value'});
-        flush(function() {
-          expect(getRowCount(table)).to.eql(1);
-          done();
+        table.addEventListener('table-rendered', function() {
+          flush(function() {
+            expect(getRowCount(table)).to.eql(1);
+            done();
+          });
         });
+        table.render();
       });
       it('should filter out items with `undefined` value', function(done) {
         table.items[0].value = 'foo';
         table.items[1].value = undefined;
         table.push('filter', {filter: 'foo', path: 'value'});
-        flush(function() {
-          expect(getRowCount(table)).to.eql(1);
-          done();
+        table.addEventListener('table-rendered', function() {
+          flush(function() {
+            expect(getRowCount(table)).to.eql(1);
+            done();
+          });
         });
+        table.render();
       });
     });
   });
