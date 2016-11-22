@@ -1,5 +1,11 @@
 # Change Log
 
+## [1.3.2] - 2016-11-22
+- Filtering items containing `null` or `undefined` values now work
+- Empty (`""`) filters are now ignored when filtering items
+- Filtering `false` values work now
+- Add filtering tests
+
 ## [1.3.1] - 2016-11-15
 - Call `notifyResize` after first rows render to fix appearance on Windows
 
