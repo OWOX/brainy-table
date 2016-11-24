@@ -1,8 +1,10 @@
 <link rel="import" href="../polymer/polymer.html">
 <link rel="import" href="../iron-icon/iron-icon.html">
 <link rel="import" href="../iron-resizable-behavior/iron-resizable-behavior.html">
+<link rel="import" href="../paper-icon-button/paper-icon-button.html">
 
 <link rel="import" href="brainy-table-column.html">
+<link rel="import" href="brainy-table-data-source-behavior.html">
 <link rel="import" href="brainy-table-icons.html">
 <link rel="import" href="brainy-td.html">
 <link rel="import" href="brainy-th.html">
@@ -19,6 +21,7 @@ Follows the guidelines of [Material Design](https://material.google.com/componen
 ### Features
 - Data filtering
 - Data sorting
+- Pagination
 - Template support for each column
 - Two-way binding support
 - Custom styling support for templates
@@ -83,7 +86,7 @@ Custom property                          | Description                          
         width: var(--brainy-table-left-shadow-width, 7px);
         top: 0;
         left: 0;
-        bottom: 0;
+        bottom: 56px;
         background: var(--brainy-table-left-shadow-background, linear-gradient(to right, rgba(37, 37, 37, 0.3), transparent));
       }
 
@@ -94,7 +97,7 @@ Custom property                          | Description                          
         width: var(--brainy-table-right-shadow-width, 7px);
         top: 0;
         right: 0;
-        bottom: 0;
+        bottom: 56px;
         background: var(--brainy-table-right-shadow-background, linear-gradient(to right, transparent, rgba(37, 37, 37, 0.3)));
       }
 
@@ -132,6 +135,23 @@ Custom property                          | Description                          
 
         @apply(--brainy-table-webkit-scrollbar);
       }
+
+      .footer {
+        box-sizing: border-box;
+        padding: 8px 6px;
+        background: #fff;
+        color: rgba(0, 0, 0, 0.54);
+        font: 500 12px/1 Roboto, sans-serif;
+        border: 1px solid #e3e3e3;
+        border-top: none;
+        text-align: right;
+      }
+
+      .footer-page {
+        display: inline-flex;
+        margin-right: 12px;
+        vertical-align: middle;
+      }
     </style>
 
     <div id="wrapper" on-scroll="_onHorizontalScroll">
@@ -165,7 +185,7 @@ Custom property                          | Description                          
       </div>
 
       <div id="container">
-        <template id="rows" is="dom-repeat" items="{{items}}" sort="[[_computeSort(sortPath, sortDirection)]]" filter="[[_computeFilter(filter.*)]]" initial-count="[[chunkSize]]" target-framerate="[[frameRate]]">
+        <template id="rows" is="dom-repeat" items="[[_currentItems]]" initial-count="[[chunkSize]]" target-framerate="[[frameRate]]">
           <div class="item">
             <brainy-tr
               even$="[[!_isEven(index)]]"
@@ -184,7 +204,6 @@ Custom property                          | Description                          
                   align-right="[[column.alignRight]]"
                   column="[[column]]"
                   expanded="[[_isExpanded(item, expandedItems, expandedItems.*)]]"
-                  detail-disabled="[[_isDetailDisabled(item, _disabledItems, _disabledItems.*)]]"
                   flex="[[column.flex]]"
                   hidden="[[column.hidden]]"
                   index="[[index]]"
@@ -208,6 +227,36 @@ Custom property                          | Description                          
         </template>
       </div>
     </div>
+    <template is="dom-if" if="[[_hasPages(items.length, pageSize)]]">
+      <div class="footer">
+        <content select="[page-size-selector]"></content>
+        <span class="footer-page" hidden$="[[!size]]">
+          <span hidden$="[[_rangeStartHidden(_currentItems.length)]]">[[_getRangeStart(_currentPage, pageSize, size)]]-</span>
+          <span>[[_getRangeEnd(_currentPage, pageSize, size)]]</span>
+          <span>&nbsp;[[_computeOf(lang)]]&nbsp;[[size]]</span>
+        </span>
+        <paper-icon-button
+          icon="brainy-table:first-page"
+          on-tap="firstPage"
+          disabled="[[_prevPageDisabled(_currentPage, pageSize, size)]]"
+        ></paper-icon-button>
+        <paper-icon-button
+          icon="brainy-table:prev-page"
+          on-tap="prevPage"
+          disabled="[[_prevPageDisabled(_currentPage, pageSize, size)]]"
+        ></paper-icon-button>
+        <paper-icon-button
+          icon="brainy-table:next-page"
+          on-tap="nextPage"
+          disabled="[[_nextPageDisabled(_currentPage, pageSize, size)]]"
+        ></paper-icon-button>
+        <paper-icon-button
+          icon="brainy-table:last-page"
+          on-tap="lastPage"
+          disabled="[[_nextPageDisabled(_currentPage, pageSize, size)]]"
+        ></paper-icon-button>
+      </div>
+    </template>
 
     <content select="brainy-table-column"></content>
     <content select="template[is=row-detail]"></content>
@@ -221,7 +270,8 @@ Custom property                          | Description                          
         is: 'brainy-table',
 
         behaviors: [
-          Polymer.IronResizableBehavior
+          Polymer.IronResizableBehavior,
+          Brainy.TableDataSourceBehavior
         ],
 
         properties: {
@@ -241,14 +291,6 @@ Custom property                          | Description                          
           frameRate: {
             type: Number,
             value: 20
-          },
-
-          /**
-           * An array containing the items which will be stamped to the column template.
-           * instances.
-           */
-          items: {
-            type: Array
           },
 
           /**
@@ -342,6 +384,14 @@ Custom property                          | Description                          
           },
 
           /**
+           * A lang for pagination counter l10n.
+           */
+          lang: {
+            type: String,
+            value: 'en'
+          },
+
+          /**
            * If `true`, custom webkit scroll bar styling will be disabled.
            */
           noCustomScroll: {
@@ -381,13 +431,15 @@ Custom property                          | Description                          
             };
 
             var hasDetails = function(node) {
-              return (node.nodeType === Node.ELEMENT_NODE &&
-                node.tagName.toUpperCase() === 'TEMPLATE' && node.hasAttribute('is') &&
-                node.getAttribute('is') === 'row-detail');
+              return (
+                node.nodeType === Node.ELEMENT_NODE &&
+                node.tagName.toUpperCase() === 'TEMPLATE' &&
+                node.hasAttribute('is') &&
+                node.getAttribute('is') === 'row-detail'
+              );
             };
 
-            if (info.addedNodes.filter(hasColumns).length > 0 ||
-              info.removedNodes.filter(hasColumns).length > 0) {
+            if (info.addedNodes.filter(hasColumns).length > 0 || info.removedNodes.filter(hasColumns).length > 0) {
               this.set('columns', this.getContentChildren('[select=brainy-table-column]'));
               this.notifyResize();
             }
@@ -404,7 +456,7 @@ Custom property                          | Description                          
           }.bind(this));
         },
 
-        attached: function() {
+        _forceResize: function() {
           Polymer.RenderStatus.afterNextRender(this.$.rows, function() {
             this.notifyResize();
           }.bind(this));
@@ -482,6 +534,15 @@ Custom property                          | Description                          
           return length - index === 1;
         },
 
+        _computeOf: function(lang) {
+          switch (lang) {
+            case 'ru':
+              return 'из';
+            default:
+              return 'of';
+          }
+        },
+
         _checkScroll: function() {
           var wrapper = this.$.wrapper;
           var width = wrapper.scrollLeft ? wrapper.scrollWidth : wrapper.clientWidth;
@@ -513,59 +574,6 @@ Custom property                          | Description                          
           } else {
             this.sortDirection = null;
           }
-        },
-
-        _computeSort: function(path, direction) {
-          var sort;
-          var table = this;
-          var _compare = function(a, b) {
-            // string comparision
-            if (typeof a === 'string' && typeof b === 'string' && !table.sortCaseSensitive) {
-              a = a.toLowerCase();
-              b = b.toLowerCase();
-            }
-            if (a < b) {
-              return -1;
-            }
-            if (a > b) {
-              return 1;
-            }
-            return 0;
-          };
-
-          if (direction === null) {
-            sort = null;
-          } else {
-            sort = function(a, b) {
-              if (direction === 'asc') {
-                return _compare(Polymer.Base.get(path, a), Polymer.Base.get(path, b));
-              } else if (direction === 'desc') {
-                return _compare(Polymer.Base.get(path, b), Polymer.Base.get(path, a));
-              }
-              return 0;
-            };
-          }
-          return sort;
-        },
-
-        _computeFilter: function(change) {
-          var filter = change.base;
-          var result = null;
-          if (filter.length) {
-            result = function(item) {
-              for (var i = 0; i < filter.length; i++) {
-                var value = Polymer.Base.get(filter[i].path, item);
-                if ([undefined, null, ''].indexOf(filter[i].filter) > -1) {
-                  continue;
-                } else if ([undefined, null].indexOf(value) > -1 ||
-                  value.toString().toLowerCase().indexOf(filter[i].filter.toString().toLowerCase()) === -1) {
-                  return false;
-                }
-              }
-              return true;
-            };
-          }
-          return result;
         },
 
         _columnsChanged: function(columns, oldColumns) {
@@ -645,7 +653,7 @@ Custom property                          | Description                          
         },
 
         _isDetailDisabled: function(item, items) {
-          return items.indexOf(item) > -1;
+          return items && items.indexOf(item) > -1;
         },
 
         _disableItemDetail: function(item) {

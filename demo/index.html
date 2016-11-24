@@ -24,7 +24,7 @@
   <link rel="import" href="../brainy-table.html">
 </head>
 
-<body class="fullbleed">
+<body unresolved class="fullbleed">
   <style is="custom-style" include="demo-pages-shared-styles">
     #tabs {
       border-bottom: solid 1px #ddd;
@@ -58,9 +58,6 @@
             <iron-ajax auto url="users.json" last-response="{{users}}"></iron-ajax>
 
             <brainy-table items="[[users.data]]">
-              <brainy-table-column name="#" flex="0" width="50px">
-                <template>[[index]]</template>
-              </brainy-table-column>
               <brainy-table-column name="First Name">
                 <template>[[item.user.name.first]]</template>
               </brainy-table-column>
@@ -93,9 +90,6 @@
 
             <paper-input class="foo" no-label-float label="Foo" value="{{foo}}"></paper-input>
             <brainy-table items="[[users.data]]">
-              <brainy-table-column name="#" flex="0" width="50px">
-                <template>[[index]]</template>
-              </brainy-table-column>
               <brainy-table-column name="First Name">
                 <template>
                   <paper-input no-label-float value="{{item.user.name.first}}"></paper-input>
@@ -108,6 +102,26 @@
                 <template>
                   <paper-input no-label-float value="{{foo}}"></paper-input>
                 </template>
+              </brainy-table-column>
+            </brainy-table>
+          </template>
+        </template>
+      </demo-snippet>
+      <h4>Pagination</h4>
+      <demo-snippet>
+        <template>
+          <template is="dom-bind">
+            <iron-ajax auto url="users.json" last-response="{{users}}"></iron-ajax>
+
+            <brainy-table items="[[users.data]]" page-size="5">
+              <brainy-table-column name="First Name">
+                <template>[[item.user.name.first]]</template>
+              </brainy-table-column>
+              <brainy-table-column name="Last Name">
+                <template>[[item.user.name.last]]</template>
+              </brainy-table-column>
+              <brainy-table-column name="Email">
+                <template>[[item.user.email]]</template>
               </brainy-table-column>
             </brainy-table>
           </template>
@@ -233,7 +247,7 @@
             </style>
             <iron-ajax auto url="users.json" last-response="{{users}}"></iron-ajax>
 
-            <brainy-table class="expandable" details-enabled items="[[users.data]]">
+            <brainy-table class="expandable" items="[[users.data]]" details-enabled>
               <brainy-table-column name="First Name">
                 <template>[[item.user.name.first]]</template>
               </brainy-table-column>
@@ -257,7 +271,7 @@
           <template is="dom-bind">
             <iron-ajax auto url="users.json" last-response="{{users}}"></iron-ajax>
 
-            <brainy-table details-enabled items="[[users.data]]">
+            <brainy-table items="[[users.data]]" details-enabled>
               <brainy-table-column name="First Name">
                 <template>[[item.user.name.first]]</template>
               </brainy-table-column>
@@ -355,7 +369,7 @@
           <template is="dom-bind">
             <iron-ajax auto url="users.json" last-response="{{users}}"></iron-ajax>
 
-            <brainy-table drag-scrollable items="[[users.data]]">
+            <brainy-table items="[[users.data]]" drag-scrollable>
               <brainy-table-column name="First Name" width="150px">
                 <template>[[item.user.name.first]]</template>
               </brainy-table-column>
@@ -381,7 +395,7 @@
           <template is="dom-bind">
             <iron-ajax auto url="users.json" last-response="{{users}}"></iron-ajax>
 
-            <brainy-table no-custom-scroll no-scroll-shadows items="[[users.data]]">
+            <brainy-table items="[[users.data]]" no-custom-scroll no-scroll-shadows>
               <brainy-table-column name="First Name" width="150px">
                 <template>[[item.user.name.first]]</template>
               </brainy-table-column>

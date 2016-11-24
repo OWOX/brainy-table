@@ -1,0 +1,257 @@
+<script>
+  var Brainy = window.Brainy || {};
+
+  /**
+   * A behavior implemented by cells instances.
+   *
+   * @polymerBehavior Brainy.TableDataSourceBehavior
+   */
+  Brainy.TableDataSourceBehavior = {
+
+    properties: {
+
+      /**
+       * An array containing the items which will be stamped to the column template
+       * instances.
+       */
+      items: {
+        type: Array
+      },
+
+      _currentItems: {
+        type: Array,
+        value: function() {
+          return [];
+        }
+      },
+
+      /**
+       * Number of items per page.
+       */
+      pageSize: {
+        type: Number,
+        value: 10,
+        observer: '_pageSizeChanged'
+      },
+
+      /**
+       * Function that provides items lazily. Receives parameters `opts`, `callback`
+       *
+       * `opts.page` Requested page index
+       *
+       * `opts.pageSize` Current page size
+       *
+       * `opts.filter` Current filter parameters
+       *
+       * `opts.sortPath` Current sorting path
+       *
+       * `opts.sortDirection` Current sorting direction
+       */
+      _dataSource: Function,
+
+      _currentPage: {
+        type: Number,
+        value: 0
+      },
+
+      /**
+       * Number of displayed items (after filtering).
+       */
+      size: {
+        type: Number,
+        notify: true,
+        value: 0
+      }
+    },
+
+    observers: [
+      '_itemsChanged(items.*)',
+      '_currentPageChanged(_dataSource, _currentPage)',
+      '_resetData(_dataSource, filter.*, sortPath, sortDirection)'
+    ],
+
+    _itemsChanged: function(items) {
+      if ((items.path === 'items' || items.path === 'items.splices') && Array.isArray(items.base)) {
+        this._dataSource = this._arrayDataSource.bind(this);
+      } else if (items.path.indexOf('items.#') === 0 && Array.isArray(items.base)) {
+        var index = items.path.split('.')[1].substring(1);
+        var item = this.items[index];
+        var cachedIndex = this._currentItems.indexOf(item);
+        if (cachedIndex >= 0) {
+          this.set(items.path.replace('items.', '_currentItems.').replace('#' + index, cachedIndex), items.value);
+        }
+      }
+    },
+
+    _arrayDataSource: function(opts, cb) {
+      var items = this.items.slice(0);
+      var page = opts.page;
+      if (this.filter && this.filter.length) {
+        items = this._filter(items, this.filter);
+      }
+      if (opts.sortPath && opts.sortDirection) {
+        items = items.sort(this._sort.bind(this));
+      }
+      var size = items.length;
+      // update pagination after filtering
+      var last = this._getLastPage(size);
+      if (page > last) {
+        page = Math.max(last, 0);
+      }
+      var start = page * opts.pageSize;
+      var end = Math.min(size, start + opts.pageSize);
+      var slice = items.slice(start, end);
+      cb(slice, size, page);
+    },
+
+    _sort: function(a, b) {
+      if (this.sortDirection === 'asc') {
+        return this._compare(Polymer.Base.get(this.sortPath, a), Polymer.Base.get(this.sortPath, b));
+      } else if (this.sortDirection === 'desc') {
+        return this._compare(Polymer.Base.get(this.sortPath, b), Polymer.Base.get(this.sortPath, a));
+      }
+      return 0;
+    },
+
+    _compare: function(a, b) {
+      // string comparision
+      if (typeof a === 'string' && typeof b === 'string' && !this.sortCaseSensitive) {
+        a = a.toLowerCase();
+        b = b.toLowerCase();
+      }
+      if (a < b) {
+        return -1;
+      }
+      if (a > b) {
+        return 1;
+      }
+      return 0;
+    },
+
+    _filter: function(items, filter) {
+      return items.filter(function(item) {
+        for (var i = 0; i < filter.length; i++) {
+          var value = Polymer.Base.get(filter[i].path, item);
+          if ([undefined, null, ''].indexOf(filter[i].filter) > -1) {
+            continue;
+          } else if ([undefined, null].indexOf(value) > -1 ||
+            value.toString().toLowerCase().indexOf(filter[i].filter.toString().toLowerCase()) === -1) {
+            return false;
+          }
+        }
+        return true;
+      });
+    },
+
+    _resetData: function() {
+      this.reload();
+    },
+
+    _currentPageChanged: function(dataSource, page) {
+      this._loadPage(dataSource, page);
+    },
+
+    _loadPage: function(dataSource, page) {
+      var success = function(items, size, newPage) {
+        if (size !== undefined) {
+          this.size = size;
+        }
+        if (newPage !== page) {
+          this._currentPage = newPage;
+        }
+        this.set('_currentItems', items.slice(0));
+        this._forceResize();
+      }.bind(this);
+      dataSource({
+        page: page,
+        pageSize: this.pageSize,
+        filter: this.filter,
+        sortPath: this.sortPath,
+        sortDirection: this.sortDirection
+      }, success);
+    },
+
+    /**
+     * Reloads current page
+     */
+    reload: function() {
+      // Force reload currently visible page
+      this._loadPage(this._dataSource, this._currentPage);
+    },
+
+    /**
+     * Loads selected page
+     * @param {Number} page - a page to load
+     */
+    loadPage: function(page) {
+      this._currentPage = page;
+    },
+
+    _pageSizeChanged: function(size, oldSize) {
+      if (size && oldSize && size !== oldSize) {
+        this.reload();
+      }
+    },
+
+    /**
+     * Navigate to the next page
+     */
+    nextPage: function() {
+      if (this._currentPage < this._getLastPage()) {
+        this._currentPage += 1;
+      }
+    },
+
+    /**
+     * Navigate to the previous page
+     */
+    prevPage: function() {
+      if (this._currentPage > 0) {
+        this._currentPage -= 1;
+      }
+    },
+
+    /**
+     * Navigate to the first page
+     */
+    firstPage: function() {
+      this.loadPage(0);
+    },
+
+    /**
+     * Navigate to the last page
+     */
+    lastPage: function() {
+      this._currentPage = this._getLastPage();
+    },
+
+    _rangeStartHidden: function(length) {
+      return length === 1;
+    },
+
+    _prevPageDisabled: function(page, pageSize, size) {
+      return page === 0 || size < pageSize;
+    },
+
+    _nextPageDisabled: function(page, pageSize, size) {
+      return (page + 1) * pageSize >= size;
+    },
+
+    _getLastPage: function(size) {
+      size = size || this.size;
+      return Math.ceil(size / this.pageSize) - 1;
+    },
+
+    _getRangeStart: function(page, pageSize, size) {
+      return size < pageSize ? 1 : (page * pageSize) + 1;
+    },
+
+    _getRangeEnd: function(page, pageSize, size) {
+      return Math.min((page + 1) * pageSize, size);
+    },
+
+    _hasPages: function(length, pageSize) {
+      return length > pageSize;
+    }
+  };
+</script>

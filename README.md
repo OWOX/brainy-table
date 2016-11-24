@@ -28,7 +28,7 @@ _[Demo and API docs](https://owox.github.io/brainy-table/)_
 -->
 ```html
 <iron-ajax auto url="demo/users.json" last-response="{{users}}"></iron-ajax>
-<brainy-table items="[[users.data]]" details-enabled>
+<brainy-table items="[[users.data]]" page-size="5" details-enabled>
   <brainy-table-column name="First Name" filter-by="user.name.first" sort-by="user.name.first">
     <template>[[item.user.name.first]]</template>
   </brainy-table-column>
@@ -60,6 +60,7 @@ Follows the guidelines of [Material Design](https://material.google.com/componen
 ## Features
 - Data filtering
 - Data sorting
+- Pagination
 - Template support for each column
 - Two-way binding support
 - Custom styling support for templates
