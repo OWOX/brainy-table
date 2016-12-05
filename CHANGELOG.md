@@ -1,5 +1,8 @@
 # Change Log
 
+## [1.3.3] - 2016-12-05
+- Add missing `polymer.html` import to hint Polymer.Templatizer behavior
+
 ## [1.3.2] - 2016-11-22
 - Filtering items containing `null` or `undefined` values now work
 - Empty (`""`) filters are now ignored when filtering items
