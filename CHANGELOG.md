@@ -1,5 +1,8 @@
 # Change Log
 
+## [1.3.4] - 2016-12-15
+- Expose `initialCount` and `targetFramerate` properties of rows `dom-repeat` template
+
 ## [1.3.3] - 2016-12-05
 - Add missing `polymer.html` import to hint Polymer.Templatizer behavior
 
