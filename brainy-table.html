@@ -165,7 +165,7 @@ Custom property                          | Description                          
       </div>
 
       <div id="container">
-        <template id="rows" is="dom-repeat" items="{{items}}" sort="[[_computeSort(sortPath, sortDirection)]]" filter="[[_computeFilter(filter.*)]]">
+        <template id="rows" is="dom-repeat" items="{{items}}" sort="[[_computeSort(sortPath, sortDirection)]]" filter="[[_computeFilter(filter.*)]]" initial-count="[[chunkSize]]" target-framerate="[[frameRate]]">
           <div class="item">
             <brainy-tr
               even$="[[!_isEven(index)]]"
@@ -225,6 +225,23 @@ Custom property                          | Description                          
         ],
 
         properties: {
+
+          /**
+           * Exposes the "initial-count" property of rows template.
+           * See dom-repeat docs for details
+           */
+          chunkSize: {
+            type: Number
+          },
+
+          /**
+           * Exposes the "targetFramerate" property of rows template.
+           * See dom-repeat docs for details
+           */
+          frameRate: {
+            type: Number,
+            value: 20
+          },
 
           /**
            * An array containing the items which will be stamped to the column template.
