@@ -1,5 +1,8 @@
 # Change Log
 
+## [1.4.0] - 2017-02-21
+- Implement pagination
+
 ## [1.3.4] - 2016-12-15
 - Expose `initialCount` and `targetFramerate` properties of rows `dom-repeat` template
 
