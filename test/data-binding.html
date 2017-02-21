@@ -26,6 +26,7 @@
   <script>
     describe('Data binding', function() {
       var table;
+      var newItem = {user: {name: {first: 'foo'}}};
       var getFirstCellText = function(table, index) {
         var row = table.querySelectorAll('brainy-tr:not([header])')[index];
         return row.querySelector('brainy-td').textContent.trim();
@@ -39,16 +40,26 @@
       });
       describe('items', function() {
         it('should be observed for shift', function(done) {
-          var newItem = {user: {name: {first: 'foo'}}};
           table.push('items', newItem);
-          table.async(function() {
+          flush(function() {
             expect(getFirstCellText(table, 3)).to.equal('foo');
             done();
-          }, 200);
+          });
         });
-        it('should be observed for mutation', function() {
+        it('should be observed for mutation', function(done) {
           table.set('items.1.user.name.first', 'bar');
-          expect(getFirstCellText(table, 1)).to.equal('bar');
+          flush(function() {
+            expect(getFirstCellText(table, 1)).to.equal('bar');
+            done();
+          });
+        });
+        it('should be observed for splice', function(done) {
+          table.splice('items', 0, 1, newItem);
+          table.render();
+          flush(function() {
+            expect(getFirstCellText(table, 0)).to.equal('foo');
+            done();
+          });
         });
       });
     });
