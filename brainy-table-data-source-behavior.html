@@ -35,6 +35,16 @@
       },
 
       /**
+       * True if items count is greater than page size.
+       */
+      hasPages: {
+        type: Boolean,
+        notify: true,
+        reflectToAttribute: true,
+        computed: '_computeHasPages(items.length, pageSize)'
+      },
+
+      /**
        * Function that provides items lazily. Receives parameters `opts`, `callback`
        *
        * `opts.page` Requested page index
@@ -250,7 +260,7 @@
       return Math.min((page + 1) * pageSize, size);
     },
 
-    _hasPages: function(length, pageSize) {
+    _computeHasPages: function(length, pageSize) {
       return length > pageSize;
     }
   };

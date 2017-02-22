@@ -86,7 +86,7 @@ Custom property                          | Description                          
         width: var(--brainy-table-left-shadow-width, 7px);
         top: 0;
         left: 0;
-        bottom: 56px;
+        bottom: 0;
         background: var(--brainy-table-left-shadow-background, linear-gradient(to right, rgba(37, 37, 37, 0.3), transparent));
       }
 
@@ -97,8 +97,13 @@ Custom property                          | Description                          
         width: var(--brainy-table-right-shadow-width, 7px);
         top: 0;
         right: 0;
-        bottom: 56px;
+        bottom: 0;
         background: var(--brainy-table-right-shadow-background, linear-gradient(to right, transparent, rgba(37, 37, 37, 0.3)));
+      }
+
+      :host([has-pages]) #wrapper.right-shadow::before,
+      :host([has-pages]) #wrapper.right-shadow::after {
+        bottom: 56px;
       }
 
       :host([details-enabled]) ::content brainy-tr:not([header]):not([detail-disabled]):hover {
@@ -227,7 +232,7 @@ Custom property                          | Description                          
         </template>
       </div>
     </div>
-    <template is="dom-if" if="[[_hasPages(items.length, pageSize)]]">
+    <template is="dom-if" if="[[hasPages]]">
       <div class="footer">
         <content select="[page-size-selector]"></content>
         <span class="footer-page" hidden$="[[!size]]">
