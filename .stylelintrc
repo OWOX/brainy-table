@@ -1,7 +1,10 @@
 {
-  "extends": "stylelint-config-polymer",
+  "extends": "stylelint-config-standard",
   "processors": [ "stylelint-processor-html" ],
   "rules": {
-    "no-empty-source": null
+    "no-empty-source": null,
+    "selector-type-no-unknown": [ true, {
+      "ignoreTypes": ["/^[a-zA-Z]([a-zA-Z0-9]*-[a-zA-Z0-9]+)+/"],
+    } ]
   }
 }
