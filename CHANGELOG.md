@@ -1,5 +1,8 @@
 # Change Log
 
+## [1.4.2] - 2017-02-23
+- Fix wrong CSS selector for left shadow
+
 ## [1.4.1] - 2017-02-22
 - Expose hasPages property. Fix shadow position when table does not have pages
 
