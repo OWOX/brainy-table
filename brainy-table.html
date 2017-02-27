@@ -58,6 +58,7 @@ Custom property                          | Description                          
 `--brainy-tr-focused`                    | Mixin applied to the row in focused state        | `{}`
 `--brainy-tr-after`                      | Mixin applied to ::after rows                    | `{}`
 `--brainy-tr-focused-after`              | Mixin applied to ::after focused rows            | `{}`
+`--brainy-table-no-results`              | Mixin applied to the "no results" container      | `{}`
 
 @element brainy-table
 @demo demo/index.html
@@ -139,6 +140,20 @@ Custom property                          | Description                          
         height: 6px;
 
         @apply(--brainy-table-webkit-scrollbar);
+      }
+
+      .no-results {
+        min-height: 48px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #fff;
+        padding: 0 24px;
+        border: 1px solid #e3e3e3;
+        border-top: none;
+        font: 500 12px/1 Roboto, sans-serif;
+
+        @apply(--brainy-table-no-results);
       }
 
       .footer {
@@ -232,9 +247,14 @@ Custom property                          | Description                          
         </template>
       </div>
     </div>
-    <template is="dom-if" if="[[hasPages]]">
+    <template is="dom-if" if="[[_computeNoResults(_currentItems.length, filter.length)]]">
+      <div class="no-results">
+        <content select="[no-results]"></content>
+      </div>
+    </template>
+    <template is="dom-if" if="[[_computeShowFooter(hasPages, _currentItems.length)]]">
       <div class="footer">
-        <content select="[page-size-selector]"></content>
+        <content select="[footer]"></content>
         <span class="footer-page" hidden$="[[!size]]">
           <span hidden$="[[_rangeStartHidden(_currentItems.length)]]">[[_getRangeStart(_currentPage, pageSize, size)]]-</span>
           <span>[[_getRangeEnd(_currentPage, pageSize, size)]]</span>
@@ -546,6 +566,14 @@ Custom property                          | Description                          
             default:
               return 'of';
           }
+        },
+
+        _computeShowFooter: function(hasPages, count) {
+          return hasPages && count;
+        },
+
+        _computeNoResults: function(itemsCount, filterCount) {
+          return filterCount && itemsCount === 0;
         },
 
         _checkScroll: function() {
