@@ -51,6 +51,7 @@ _[Demo and API docs](https://owox.github.io/brainy-table/)_
   <template is="row-detail">
     <div>[[item.user.location.street]], [[item.user.location.city]], [[item.user.location.state]]</div>
   </template>
+  <div no-results>No records found</div>
 </brainy-table>
 ```
 
