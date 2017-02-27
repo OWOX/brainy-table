@@ -1,5 +1,8 @@
 # Change Log
 
+## [1.4.3] - 2017-02-27
+- Handle case when there are no matching records after applying filter (#8)
+
 ## [1.4.2] - 2017-02-23
 - Fix wrong CSS selector for left shadow
 
