@@ -1,5 +1,8 @@
 # Change Log
 
+## [1.4.5] - 2017-02-28
+- Fix footer height and spinner positioning
+
 ## [1.4.4] - 2017-02-28
 - Show spinner in footer when loading is set to true. Fixes #6
 - Make disabled buttons lighter and allow to configure this
