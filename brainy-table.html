@@ -60,6 +60,7 @@ Custom property                          | Description                          
 `--brainy-tr-after`                      | Mixin applied to ::after rows                    | `{}`
 `--brainy-tr-focused-after`              | Mixin applied to ::after focused rows            | `{}`
 `--brainy-table-no-results`              | Mixin applied to the "no results" container      | `{}`
+`--brainy-table-pager-disabled-color`    | Color of the disabled pagination button          | `#d3d3d3`
 
 @element brainy-table
 @demo demo/index.html
@@ -72,6 +73,7 @@ Custom property                          | Description                          
         display: block;
         position: relative;
         --paper-spinner-color: var(--primary-color, --google-blue-500);
+        --paper-icon-button-disabled-text: var(--brainy-table-pager-disabled-color, #d3d3d3);
 
         @apply(--brainy-table);
       }
