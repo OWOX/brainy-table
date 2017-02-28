@@ -1,5 +1,9 @@
 # Change Log
 
+## [1.4.4] - 2017-02-28
+- Show spinner in footer when loading is set to true. Fixes #6
+- Make disabled buttons lighter and allow to configure this
+
 ## [1.4.3] - 2017-02-27
 - Handle case when there are no matching records after applying filter (#8)
 
