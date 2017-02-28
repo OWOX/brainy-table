@@ -2,6 +2,7 @@
 <link rel="import" href="../iron-icon/iron-icon.html">
 <link rel="import" href="../iron-resizable-behavior/iron-resizable-behavior.html">
 <link rel="import" href="../paper-icon-button/paper-icon-button.html">
+<link rel="import" href="../paper-spinner/paper-spinner-lite.html">
 
 <link rel="import" href="brainy-table-column.html">
 <link rel="import" href="brainy-table-data-source-behavior.html">
@@ -70,6 +71,7 @@ Custom property                          | Description                          
       :host {
         display: block;
         position: relative;
+        --paper-spinner-color: var(--primary-color, --google-blue-500);
 
         @apply(--brainy-table);
       }
@@ -172,6 +174,12 @@ Custom property                          | Description                          
         margin-right: 12px;
         vertical-align: middle;
       }
+
+      .spinner {
+        position: relative;
+        top: 10px;
+        margin-right: 10px;
+      }
     </style>
 
     <div id="wrapper" on-scroll="_onHorizontalScroll">
@@ -255,6 +263,9 @@ Custom property                          | Description                          
     <template is="dom-if" if="[[_computeShowFooter(hasPages, _currentItems.length)]]">
       <div class="footer">
         <content select="[footer]"></content>
+        <template is="dom-if" if="[[loading]]">
+          <paper-spinner-lite class="spinner" active></paper-spinner-lite>
+        </template>
         <span class="footer-page" hidden$="[[!size]]">
           <span hidden$="[[_rangeStartHidden(_currentItems.length)]]">[[_getRangeStart(_currentPage, pageSize, size)]]-</span>
           <span>[[_getRangeEnd(_currentPage, pageSize, size)]]</span>
@@ -355,6 +366,13 @@ Custom property                          | Description                          
             value: function() {
               return [];
             }
+          },
+
+          /**
+           * If `true`, the spinner will be shown in the footer. Set this if you use batches to load data.
+           */
+          loading: {
+            type: Boolean
           },
 
           /**
