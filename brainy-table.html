@@ -147,7 +147,6 @@ Custom property                          | Description                          
       }
 
       .no-results {
-        min-height: 48px;
         display: flex;
         align-items: center;
         justify-content: center;
@@ -164,7 +163,6 @@ Custom property                          | Description                          
         display: flex;
         align-items: center;
         justify-content: flex-end;
-        height: 56px;
         box-sizing: border-box;
         padding: 8px 6px;
         background: #fff;
@@ -190,12 +188,12 @@ Custom property                          | Description                          
         <brainy-tr header>
           <template is="dom-repeat" items="[[columns]]" as="column">
             <brainy-th
-              header
               align-right="[[column.alignRight]]"
               column="[[column]]"
               flex="[[column.flex]]"
               hidden="[[column.hidden]]"
               order="[[column.order]]"
+              header-height="[[headerHeight]]"
               table="[[_this]]"
               template="[[column.headerTemplate]]"
               width="[[column.width]]"
@@ -233,6 +231,7 @@ Custom property                          | Description                          
                   template="[[column.template]]"
                   table="[[_this]]"
                   align-right="[[column.alignRight]]"
+                  row-min-height="[[rowMinHeight]]"
                   column="[[column]]"
                   expanded="[[_isExpanded(item, expandedItems, expandedItems.*)]]"
                   flex="[[column.flex]]"
@@ -259,12 +258,12 @@ Custom property                          | Description                          
       </div>
     </div>
     <template is="dom-if" if="[[_computeNoResults(_currentItems.length, filter.length)]]">
-      <div class="no-results">
+      <div class="no-results" style$="min-height: [[rowMinHeight]]px">
         <content select="[no-results]"></content>
       </div>
     </template>
     <template is="dom-if" if="[[_computeShowFooter(hasPages, _currentItems.length)]]">
-      <div class="footer">
+      <div class="footer" style$="height: [[headerHeight]]px">
         <content select="[footer]"></content>
         <template is="dom-if" if="[[loading]]">
           <paper-spinner-lite class="spinner" active></paper-spinner-lite>
@@ -330,6 +329,24 @@ Custom property                          | Description                          
           frameRate: {
             type: Number,
             value: 20
+          },
+
+          /**
+           * An height of the table header and footer.
+           */
+          headerHeight: {
+            type: Number,
+            value: 56,
+            notify: true
+          },
+
+          /**
+           * An min-height of the table rows.
+           */
+          rowMinHeight: {
+            type: Number,
+            value: 48,
+            notify: true
           },
 
           /**

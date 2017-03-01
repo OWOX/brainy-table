@@ -17,6 +17,7 @@
       flex: Number,
       hidden: Boolean,
       order: Number,
+      rowMinHeight: Number,
       template: Object,
       width: String
     },
@@ -28,6 +29,7 @@
       '_flexChanged(flex)',
       '_hiddenChanged(hidden)',
       '_orderChanged(order)',
+      '_rowMinHeightChanged(rowMinHeight)',
       '_widthChanged(width)'
     ],
 
@@ -55,6 +57,10 @@
 
     _flexChanged: function(flex) {
       this.style.flexGrow = flex;
+    },
+
+    _rowMinHeightChanged: function(rowMinHeight) {
+      this.style.minHeight = Number(rowMinHeight) + 'px';
     },
 
     _widthChanged: function(width) {

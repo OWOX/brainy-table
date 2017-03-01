@@ -7,7 +7,6 @@
   <template>
     <style include="brainy-table-cell-shared-styles">
       :host {
-        height: 56px;
         position: relative;
         overflow: hidden;
         font: 600 12px/1.1 Roboto, sans-serif;
@@ -77,6 +76,9 @@
             type: String,
             reflectToAttribute: true
           },
+          headerHeight: {
+            type: Number
+          },
           sortBy: {
             type: String,
             value: null,
@@ -89,7 +91,8 @@
         },
 
         observers: [
-          '_sortChanged(currentSortPath, currentSortDirection)'
+          '_sortChanged(currentSortPath, currentSortDirection)',
+          '_headerHeightChanged(headerHeight)'
         ],
 
         _sortChanged: function(path, direction) {
@@ -99,6 +102,10 @@
           } else {
             this.direction = null;
           }
+        },
+
+        _headerHeightChanged: function(headerHeight) {
+          this.style.height = Number(headerHeight) + 'px';
         },
 
         _onTap: function(event) {
