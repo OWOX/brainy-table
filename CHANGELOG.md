@@ -1,5 +1,8 @@
 # Change Log
 
+## [1.5.0] - 2017-03-01
+- Expose headerHeight and rowMinHeight properties
+
 ## [1.4.5] - 2017-02-28
 - Fix footer height and spinner positioning
 
