@@ -27,6 +27,8 @@
     describe('Data binding', function() {
       var table;
       var newItem = {user: {name: {first: 'foo'}}};
+      var modified1;
+      var modified2;
       var getFirstCellText = function(table, index) {
         var row = table.querySelectorAll('brainy-tr:not([header])')[index];
         return row.querySelector('brainy-td').textContent.trim();
@@ -53,11 +55,16 @@
             done();
           });
         });
-        it('should be observed for splice', function(done) {
-          table.splice('items', 0, 1, newItem);
+        it('should be observed for splice when modifiying items', function(done) {
+          modified1 = table.items[0];
+          modified1.user.name.first = 'foo';
+          modified2 = table.items[1];
+          modified2.user.name.first = 'bar';
+          table.splice('items', 0, 3, modified1, modified2);
           table.render();
           flush(function() {
             expect(getFirstCellText(table, 0)).to.equal('foo');
+            expect(getFirstCellText(table, 1)).to.equal('bar');
             done();
           });
         });
