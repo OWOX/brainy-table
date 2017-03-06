@@ -7,7 +7,7 @@
   },
   "license": "MIT",
   "devDependencies": {
-    "eslint": "^3.16.1",
+    "eslint": "^3.17.0",
     "eslint-config-google": "^0.6.0",
     "eslint-plugin-html": "^1.7.0",
     "npm-run-all": "^4.0.2",
