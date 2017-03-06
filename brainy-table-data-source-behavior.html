@@ -81,7 +81,18 @@
     ],
 
     _itemsChanged: function(items) {
-      if ((items.path === 'items' || items.path === 'items.splices') && Array.isArray(items.base)) {
+      if (items.path === 'items' && Array.isArray(items.base)) {
+        this._dataSource = this._arrayDataSource.bind(this);
+      } else if (items.path === 'items.splices' && Array.isArray(items.base) && items.value.indexSplices) {
+        var removed = items.value.indexSplices[0].removed;
+        removed.forEach(function(item) {
+          var index = this._currentItems.indexOf(item);
+          if (index >= 0) {
+            Object.keys(item).forEach(function(key) {
+              this.set('_currentItems.#' + index + '.' + key, this._currentItems[index][key]);
+            }.bind(this));
+          }
+        }.bind(this));
         this._dataSource = this._arrayDataSource.bind(this);
       } else if (items.path.indexOf('items.#') === 0 && Array.isArray(items.base)) {
         var index = items.path.split('.')[1].substring(1);
