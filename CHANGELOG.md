@@ -1,5 +1,8 @@
 # Change Log
 
+## [1.5.1] - 2017-03-06
+- Fix case when splices are not propagated to data bindings
+
 ## [1.5.0] - 2017-03-01
 - Expose headerHeight and rowMinHeight properties
 
