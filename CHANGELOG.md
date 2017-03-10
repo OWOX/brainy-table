@@ -1,5 +1,8 @@
 # Change Log
 
+## [1.5.2] - 2017-03-10
+- Fix sort icon position when align-right is set to true, add TODO to refactor this
+
 ## [1.5.1] - 2017-03-06
 - Fix case when splices are not propagated to data bindings
 
