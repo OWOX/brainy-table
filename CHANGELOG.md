@@ -1,5 +1,8 @@
 # Change Log
 
+## [1.5.3] - 2017-03-22
+- Fix wrong attribute on sort icon
+
 ## [1.5.2] - 2017-03-10
 - Fix sort icon position when align-right is set to true, add TODO to refactor this
 
