@@ -70,6 +70,7 @@ Follows the guidelines of [Material Design](https://material.google.com/componen
 - Column manipulation, resizing, hiding, reordering
 - Custom header templates
 - Row details
+- Disabling row details depending on item subproperty value
 - Horizontal scrolling shadows
 - "Drag-and-drop" scroll
 

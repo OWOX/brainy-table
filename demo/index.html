@@ -372,11 +372,17 @@
       </demo-snippet>
       <h4>Disable details for particular rows</h4>
       <demo-snippet>
+        <style is="custom-style">
+          brainy-tr[detail-disabled] paper-checkbox {
+            opacity: 0.7;
+            pointer-events: none;
+          }
+        </style>
         <template>
           <template is="dom-bind">
             <iron-ajax auto url="users.json" last-response="{{users}}"></iron-ajax>
 
-            <brainy-table items="[[users.data]]">
+            <brainy-table id="demoDisabled" items="[[users.data]]">
               <brainy-table-column name="First Name">
                 <template>[[item.user.name.first]]</template>
               </brainy-table-column>
@@ -388,11 +394,7 @@
               </brainy-table-column>
               <brainy-table-column flex="1" width="50px" align-right>
                 <template>
-                  <paper-checkbox checked="{{expanded}}" disabled="[[detailDisabled]]">Details</paper-checkbox>
-                  <brainy-tr-config
-                    should-disable-detail="[[item.user.private]]"
-                    detail-disabled="{{detailDisabled}}"
-                  ></brainy-tr-config>
+                  <paper-checkbox checked="{{expanded}}">Details</paper-checkbox>
                 </template>
               </brainy-table-column>
 
@@ -469,6 +471,11 @@
       tabs.addEventListener('iron-select', function(e) {
         document.getElementById('pages').select(e.detail.item.getAttribute('tab'));
       });
+
+      var demoDisabled = document.getElementById('demoDisabled');
+      demoDisabled.shouldDisableDetailCallback = function(item) {
+        return item.user && item.user.private;
+      };
     });
   </script>
 </body>

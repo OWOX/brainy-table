@@ -10,7 +10,6 @@
    */
   Brainy.TableTemplatizerBehaviorImpl = {
     properties: {
-      detailDisabled: Boolean,
       expanded: Boolean,
       index: Number,
       item: Object,
@@ -28,7 +27,6 @@
     },
 
     observers: [
-      '_detailDisabledChanged(_instance, detailDisabled)',
       '_expandedChanged(_instance, expanded)',
       '_indexChanged(_instance, index)',
       '_itemChanged(_instance, item)',
@@ -38,7 +36,6 @@
     created: function() {
       this._instanceProps = {
         column: true,
-        detailDisabled: true,
         expanded: true,
         index: true,
         item: true
@@ -98,11 +95,6 @@
       return this._getBinding(prop, dataHost.dataHost);
     },
 
-    _detailDisabledChanged: function(instance, disabled) {
-      this._detailDisabled = disabled;
-      instance.detailDisabled = disabled;
-    },
-
     _expandedChanged: function(instance, expanded) {
       // store original expanded value to detect when value change has
       // originated from within the template.
@@ -145,18 +137,11 @@
     },
 
     _forwardInstanceProp: function(inst, prop, value) {
-      if (prop === 'expanded' && inst.item && this._expanded !== value && !this._detailDisabled) {
+      if (prop === 'expanded' && inst.item && this._expanded !== value && !this.table._isDetailDisabled(inst.item)) {
         if (value) {
           this.table.expandItem(inst.item);
         } else {
           this.table.collapseItem(inst.item);
-        }
-      }
-      if (prop === 'detailDisabled' && inst.item && this._detailDisabled !== value) {
-        if (value) {
-          this.table._disableItemDetail(inst.item);
-        } else {
-          this.table._enableItemDetail(inst.item);
         }
       }
     },
