@@ -704,10 +704,11 @@ Custom property                          | Description                          
          * @param {Object} item - An item to expand
          */
         expandItem: function(item) {
-          if (this._rowDetail && this.expandedItems && !this._isExpanded(item, this.expandedItems)) {
+          var expanded = this.expandedItems;
+          if (this._rowDetail && expanded && !this._isExpanded(item, expanded) && !this._isDetailDisabled(item)) {
             // replacing the whole array here to simplify the observers.
-            this.expandedItems.push(item);
-            this.expandedItems = this.expandedItems.slice(0);
+            expanded.push(item);
+            this.expandedItems = expanded.slice(0);
           }
         },
 
@@ -716,12 +717,13 @@ Custom property                          | Description                          
          * @param {Object} item - An item to expand
          */
         collapseItem: function(item) {
-          if (this._rowDetail && this.expandedItems && this._isExpanded(item, this.expandedItems)) {
-            var index = this.expandedItems.indexOf(item);
+          var expanded = this.expandedItems;
+          if (this._rowDetail && expanded && this._isExpanded(item, expanded) && !this._isDetailDisabled(item)) {
+            var index = expanded.indexOf(item);
 
             // replacing the whole array here to simplify the observers.
-            this.expandedItems.splice(index, 1);
-            this.expandedItems = this.expandedItems.slice(0);
+            expanded.splice(index, 1);
+            this.expandedItems = expanded.slice(0);
           }
         },
 
