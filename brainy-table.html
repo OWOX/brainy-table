@@ -412,8 +412,10 @@ Custom property                          | Description                          
           },
 
           /**
-           * Allows to pass a function, which will be applied for item to test if row detail should be expanded, e. g.
-           * Declare it like this:
+           * Allows to pass a function, which will be applied for item
+           * to test if row detail should be expanded.
+           *
+           * Declare it in your container element like this:
            * ```
            * properties: {
            *   callback: {
@@ -421,14 +423,15 @@ Custom property                          | Description                          
            *     value: function() {
            *       return function (item) {
            *         return item.type === 'private';
-           *       }.bind(this);
+           *       };
            *     }
            *   }
            * }
            * ```
+           *
            * And then pass it like this:
            * ```
-           * <brainy-table should-disable-detail-callback="[[callback]]">
+           * <brainy-table items="[[items]]" should-disable-detail-callback="[[callback]]">
            * ```
            */
           shouldDisableDetailCallback: {
