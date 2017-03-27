@@ -1,5 +1,8 @@
 # Change Log
 
+## [1.6.0] - 2017-03-27
+- Rewrite disabling row detail: use callback instead of data bindings
+
 ## [1.5.3] - 2017-03-22
 - Fix wrong attribute on sort icon
 
