@@ -10,7 +10,6 @@
 <link rel="import" href="brainy-td.html">
 <link rel="import" href="brainy-th.html">
 <link rel="import" href="brainy-tr.html">
-<link rel="import" href="brainy-tr-config.html">
 <link rel="import" href="brainy-tr-detail.html">
 
 <!--
@@ -31,6 +30,7 @@ Follows the guidelines of [Material Design](https://material.google.com/componen
 - Column manipulation, resizing, hiding, reordering
 - Custom header templates
 - Row details
+- Disabling row details depending on item subproperty value
 - Horizontal scrolling shadows
 - "Drag-and-drop" scroll
 
@@ -220,7 +220,7 @@ Custom property                          | Description                          
               first$="[[_isFirst(index)]]"
               last$="[[_isLast(index, items.length)]]"
               expanded="[[_isExpanded(item, expandedItems, expandedItems.*)]]"
-              detail-disabled="[[_isDetailDisabled(item, _disabledItems, _disabledItems.*)]]"
+              detail-disabled="[[_isDetailDisabled(item, shouldDisableDetailCallback)]]"
               index="[[index]]"
               item="[[item]]"
               tabindex="-1"
@@ -349,16 +349,6 @@ Custom property                          | Description                          
           },
 
           /**
-           * An array containing items for those row details are disabled (cannot be expanded).
-           */
-          _disabledItems: {
-            type: Array,
-            value: function() {
-              return [];
-            }
-          },
-
-          /**
            * If `true`, tapping a row will expand the item details, if available.
            */
           detailsEnabled: {
@@ -419,6 +409,31 @@ Custom property                          | Description                          
             type: String,
             value: null,
             notify: true
+          },
+
+          /**
+           * Allows to pass a function, which will be applied for item to test if row detail should be expanded, e. g.
+           * Declare it like this:
+           * ```
+           * properties: {
+           *   callback: {
+           *     type: Object,
+           *     value: function() {
+           *       return function (item) {
+           *         return item.type === 'private';
+           *       }.bind(this);
+           *     }
+           *   }
+           * }
+           * ```
+           * And then pass it like this:
+           * ```
+           * <brainy-table should-disable-detail-callback="[[callback]]">
+           * ```
+           */
+          shouldDisableDetailCallback: {
+            type: Function,
+            value: null
           },
 
           /**
@@ -689,10 +704,11 @@ Custom property                          | Description                          
          * @param {Object} item - An item to expand
          */
         expandItem: function(item) {
-          if (this._rowDetail && this.expandedItems && !this._isExpanded(item, this.expandedItems)) {
+          var expanded = this.expandedItems;
+          if (this._rowDetail && expanded && !this._isExpanded(item, expanded) && !this._isDetailDisabled(item)) {
             // replacing the whole array here to simplify the observers.
-            this.expandedItems.push(item);
-            this.expandedItems = this.expandedItems.slice(0);
+            expanded.push(item);
+            this.expandedItems = expanded.slice(0);
           }
         },
 
@@ -701,12 +717,13 @@ Custom property                          | Description                          
          * @param {Object} item - An item to expand
          */
         collapseItem: function(item) {
-          if (this._rowDetail && this.expandedItems && this._isExpanded(item, this.expandedItems)) {
-            var index = this.expandedItems.indexOf(item);
+          var expanded = this.expandedItems;
+          if (this._rowDetail && expanded && this._isExpanded(item, expanded) && !this._isDetailDisabled(item)) {
+            var index = expanded.indexOf(item);
 
             // replacing the whole array here to simplify the observers.
-            this.expandedItems.splice(index, 1);
-            this.expandedItems = this.expandedItems.slice(0);
+            expanded.splice(index, 1);
+            this.expandedItems = expanded.slice(0);
           }
         },
 
@@ -722,16 +739,9 @@ Custom property                          | Description                          
           return items && items.indexOf(item) > -1;
         },
 
-        _isDetailDisabled: function(item, items) {
-          return items && items.indexOf(item) > -1;
-        },
-
-        _disableItemDetail: function(item) {
-          this.push('_disabledItems', item);
-        },
-
-        _enableItemDetail: function(item) {
-          this.splice('_disabledItems', this._disabledItems.indexOf(item), 1);
+        _isDetailDisabled: function(item, cb) {
+          cb = cb || this.shouldDisableDetailCallback;
+          return cb ? cb(item) : null;
         },
 
         _isFocusable: function(target) {
@@ -778,7 +788,7 @@ Custom property                          | Description                          
                 defaultAction.call(this, item);
               }
             }.bind(this);
-            if (this._rowDetail && this.detailsEnabled && !this._isDetailDisabled(target, this._disabledItems)) {
+            if (this._rowDetail && this.detailsEnabled && !this._isDetailDisabled(target)) {
               if (this._isExpanded(target, this.expandedItems)) {
                 fireEvent('collapsing-item', target, this.collapseItem);
               } else {

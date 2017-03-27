@@ -51,11 +51,6 @@
   <test-fixture id="table3">
     <template>
       <brainy-table details-enabled>
-        <brainy-table-column>
-          <template>
-            <paper-checkbox checked="{{detailDisabled}}">Disable detail</paper-checkbox>
-          </template>
-        </brainy-table-column>
         <brainy-table-column name="First Name">
           <template>[[item.user.name.first]]</template>
         </brainy-table-column>
@@ -193,32 +188,22 @@
       describe('disabling row details for particular rows', function() {
         beforeEach(function(done) {
           table = fixture('table3');
+          table.shouldDisableDetailCallback = function(item) {
+            return item.user.gender === 'male';
+          };
           Polymer.dom.flush();
           table.items = window.users;
           Polymer.Base.async(done, 200);
         });
 
-        it('should disable row detail when row cell with disableDetail property bound is activated', function(done) {
+        it('should disable row detail applying callback resulted in true', function(done) {
           firstRow = getFirstRow(table);
-          firstRow.querySelector('paper-checkbox').click();
           getFirstCell(table).click();
           setTimeout(function() {
             var rowDetail = firstRow.querySelector('brainy-tr-detail');
             expect(rowDetail).to.equal(null);
             expect(firstRow.getAttribute('expanded')).to.equal(null);
             expect(firstRow.getAttribute('detail-disabled')).to.not.equal(null);
-            done();
-          }, 50);
-        });
-
-        it('should re-enable row detail when cell with disableDetail property is deactivated', function(done) {
-          firstRow = getFirstRow(table);
-          var checkbox = firstRow.querySelector('paper-checkbox');
-          checkbox.click();
-          checkbox.click();
-          getFirstCell(table).click();
-          setTimeout(function() {
-            expect(firstRow.getAttribute('detail-disabled')).to.equal(null);
             done();
           }, 50);
         });
