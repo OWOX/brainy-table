@@ -1,5 +1,8 @@
 # Change Log
 
+## [1.7.1] - 2017-03-28
+- Fix loading page attempt before data source initialization (#11)
+
 ## [1.7.0] - 2017-03-28
 - Refactor sorting to fit Material Design spec. Allow to configure default sorting
 
