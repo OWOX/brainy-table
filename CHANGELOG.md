@@ -1,5 +1,8 @@
 # Change Log
 
+## [1.7.0] - 2017-03-28
+- Refactor sorting to fit Material Design spec. Allow to configure default sorting
+
 ## [1.6.0] - 2017-03-27
 - Rewrite disabling row detail: use callback instead of data bindings
 
