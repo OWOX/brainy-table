@@ -19,24 +19,34 @@
 
       :host ::content iron-icon[sort-trigger] {
         position: relative;
-        width: 16px;
+        width: 0;
         height: 16px;
-        flex: 0 0 16px;
         fill: rgba(0, 0, 0, 0.87);
-        transition: transform 0.25s;
+        transition: transform 0.25s linear, width 0.2s linear, color 0.2s linear;
       }
 
-      /* TODO refactor for ::slotted compatibility */
-      :host([direction]) ::content iron-icon[sort-trigger] ~ * {
+      /* show icon upon hover, or if column sorting is enabled */
+      :host([sort-by]:hover) ::content iron-icon[sort-trigger],
+      :host([direction]) ::content iron-icon[sort-trigger] {
+        width: 16px;
+      }
+
+      :host([sort-by]) .icon {
+        width: 16px;
+        flex: 0 0 16px;
+      }
+
+      .inner {
+        display: flex;
+        align-items: center;
+      }
+
+      :host([direction]) .inner {
         color: rgba(0, 0, 0, 0.87);
       }
 
       :host(:not([direction])) ::content iron-icon[sort-trigger] {
         fill: rgba(0, 0, 0, 0.38);
-      }
-
-      :host ::content iron-icon[sort-trigger]:hover {
-        fill: var(--default-primary-color);
       }
 
       :host([direction='desc']) ::content iron-icon[sort-trigger] {
@@ -55,13 +65,18 @@
         left: -4px;
       }
 
-      :host(:not([align-right])) ::content iron-icon[sort-trigger]:not([hidden]) ~ * {
+      :host([sort-by]:not([align-right])) .inner {
         position: relative;
         left: -16px;
       }
     </style>
     <paper-ripple id="ripple" noink></paper-ripple>
-    <content></content>
+    <div class="icon">
+      <content select="iron-icon"></content>
+    </div>
+    <div class="inner">
+      <content></content>
+    </div>
   </template>
   <script>
     (function() {
@@ -80,6 +95,12 @@
           direction: {
             type: String,
             reflectToAttribute: true
+          },
+          defaultSortPath: {
+            type: String
+          },
+          noResetSort: {
+            type: Boolean
           },
           headerHeight: {
             type: Number
@@ -128,7 +149,7 @@
               break;
 
             case 'desc':
-              this.direction = null;
+              this.direction = this.defaultSortPath === this.sortBy && !this.noResetSort ? 'asc' : null;
               break;
 
             default:

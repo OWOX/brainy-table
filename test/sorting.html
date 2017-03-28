@@ -117,13 +117,15 @@
             done();
           }, 100);
         });
+      });
 
-        it('should update sorting icon', function() {
-          table.sortPath = 'user.name.first';
-          table.sortDirection = 'desc';
-          var columnSort = columnSortElement(1);
+      describe('using defaultSortPath and defaultSortDirection properties', function() {
+        it('should sort items descending', function(done) {
+          table.defaultSortPath = 'user.name.first';
+          table.defaultSortDirection = 'desc';
           table.async(function() {
-            expect(columnSort.getAttribute('direction')).to.eql('desc');
+            expect(getFirstCellText()).to.equal('samuel');
+            done();
           }, 100);
         });
       });
