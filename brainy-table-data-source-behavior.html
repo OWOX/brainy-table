@@ -197,7 +197,9 @@
      */
     reload: function() {
       // Force reload currently visible page
-      this._loadPage(this._dataSource, this._currentPage);
+      if (typeof this._dataSource !== 'undefined') {
+        this._loadPage(this._dataSource, this._currentPage);
+      }
     },
 
     /**
