@@ -574,6 +574,7 @@ Custom property                          | Description                          
         _forceResize: function() {
           Polymer.RenderStatus.afterNextRender(this.$.rows, function() {
             this.notifyResize();
+            this.fire('table-resize');
           }.bind(this));
         },
 
