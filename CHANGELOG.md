@@ -1,5 +1,8 @@
 # Change Log
 
+## [1.7.2] - 2017-03-30
+- Add `table-resize` event
+
 ## [1.7.1] - 2017-03-28
 - Fix loading page attempt before data source initialization (#11)
 
