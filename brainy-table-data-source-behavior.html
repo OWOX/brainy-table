@@ -108,7 +108,16 @@
       var items = this.items.slice(0);
       var page = opts.page;
       if (this.filter && this.filter.length) {
+        var columns = this.columns;
         items = this._filter(items, this.filter);
+        this.filter.forEach(function(option) {
+          for (var i = 0; i < columns.length; i++) {
+            if (columns[i].filterBy === option.path) {
+              columns[i].set('filterValue', option.filter);
+              break;
+            }
+          }
+        });
       }
       if (opts.sortPath && opts.sortDirection) {
         items = items.sort(this._sort.bind(this));
