@@ -1,5 +1,8 @@
 # Change Log
 
+## [1.7.3] - 2017-04-05
+- Fix filter value not propagating to input when filtering from outside
+
 ## [1.7.2] - 2017-03-30
 - Add `table-resize` event
 
