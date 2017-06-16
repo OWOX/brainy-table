@@ -178,6 +178,19 @@ Custom property                          | Description                          
         vertical-align: middle;
       }
 
+      @media (max-width: 480px) {
+        .footer-page {
+          margin-right: 6px;
+        }
+
+        .footer-btn {
+          width: 30px;
+          height: 30px;
+          flex: 0 0 30px;
+          padding: 3px;
+        }
+      }
+
       .spinner {
         margin-right: 10px;
       }
@@ -278,21 +291,25 @@ Custom property                          | Description                          
           icon="brainy-table:first-page"
           on-tap="firstPage"
           disabled="[[_prevPageDisabled(_currentPage, pageSize, size)]]"
+          class="footer-btn"
         ></paper-icon-button>
         <paper-icon-button
           icon="brainy-table:prev-page"
           on-tap="prevPage"
           disabled="[[_prevPageDisabled(_currentPage, pageSize, size)]]"
+          class="footer-btn"
         ></paper-icon-button>
         <paper-icon-button
           icon="brainy-table:next-page"
           on-tap="nextPage"
           disabled="[[_nextPageDisabled(_currentPage, pageSize, size)]]"
+          class="footer-btn"
         ></paper-icon-button>
         <paper-icon-button
           icon="brainy-table:last-page"
           on-tap="lastPage"
           disabled="[[_nextPageDisabled(_currentPage, pageSize, size)]]"
+          class="footer-btn"
         ></paper-icon-button>
       </div>
     </template>
