@@ -1,5 +1,8 @@
 # Change Log
 
+## [1.7.4] - 2017-06-16
+- Fix footer buttons appearance on mobile screen sizes
+
 ## [1.7.3] - 2017-04-05
 - Fix filter value not propagating to input when filtering from outside
 
