@@ -4,7 +4,7 @@
   "rules": {
     "no-empty-source": null,
     "selector-type-no-unknown": [ true, {
-      "ignoreTypes": ["/^[a-zA-Z]([a-zA-Z0-9]*-[a-zA-Z0-9]+)+/"],
+      "ignore": ["custom-elements"]
     } ]
   }
 }
