@@ -1,5 +1,9 @@
 # Change Log
 
+## [1.8.0] - 2017-07-28
+- Change font-weight from light to regular
+- Use consistent font smoothing vendor prefixes
+
 ## [1.7.4] - 2017-06-16
 - Fix footer buttons appearance on mobile screen sizes
 
