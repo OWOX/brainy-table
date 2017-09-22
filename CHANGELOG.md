@@ -1,5 +1,8 @@
 # Change Log
 
+## [1.9.0] - 2017-09-22
+- Refactor hiding columns to update table borders properly
+
 ## [1.8.0] - 2017-07-28
 - Change font-weight from light to regular
 - Use consistent font smoothing vendor prefixes
