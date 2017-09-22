@@ -702,6 +702,7 @@ Custom property                          | Description                          
         },
 
         _updateCells: function() {
+          Polymer.dom.flush();
           this.queryAllEffectiveChildren('brainy-tr').forEach(function(row) {
             row.updateCells();
           });
@@ -750,9 +751,7 @@ Custom property                          | Description                          
             }.bind(this));
           }
 
-          Polymer.dom.flush();
-
-          this._updateCells();
+          this.async(this._updateCells);
         },
 
         _onColumnFilterChanged: function(e) {

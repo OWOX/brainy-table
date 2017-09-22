@@ -208,7 +208,7 @@
       // Force reload currently visible page
       if (typeof this._dataSource !== 'undefined') {
         this._loadPage(this._dataSource, this._currentPage);
-        Polymer.RenderStatus.afterNextRender(this, this._updateCells);
+        this._updateCells();
       }
     },
 
