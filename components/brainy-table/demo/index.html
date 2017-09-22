@@ -1,0 +1,524 @@
+<!doctype html>
+<html>
+<head>
+  <title>brainy-table demo</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1, user-scalable=yes">
+  <script src="../../webcomponentsjs/webcomponents-lite.js"></script>
+  <script>
+    window.Polymer = {
+      dom: 'shady',
+      lazyRegister: true
+    };
+  </script>
+  <link rel="import" href="../../iron-ajax/iron-ajax.html">
+  <link rel="import" href="../../iron-icon/iron-icon.html">
+  <link rel="import" href="../../iron-icons/iron-icons.html">
+  <link rel="import" href="../../iron-flex-layout/iron-flex-layout-classes.html">
+  <link rel="import" href="../../iron-pages/iron-pages.html">
+  <link rel="import" href="../../iron-demo-helpers/demo-snippet.html">
+  <link rel="import" href="../../iron-demo-helpers/demo-pages-shared-styles.html">
+  <link rel="import" href="../../paper-tabs/paper-tabs.html">
+  <link rel="import" href="../../paper-checkbox/paper-checkbox.html">
+  <link rel="import" href="../../vaadin-combo-box/vaadin-combo-box.html">
+  <link rel="import" href="../brainy-table.html">
+</head>
+
+<body unresolved class="fullbleed">
+  <style is="custom-style" include="demo-pages-shared-styles">
+    #tabs {
+      border-bottom: solid 1px #ddd;
+    }
+
+    .centered {
+      max-width: 800px;
+    }
+
+    :root {
+      --primary-color: #08c;
+      --paper-tabs-selection-bar-color: #08c;
+      --paper-tab-ink: #08c;
+    }
+  </style>
+
+  <paper-tabs id="tabs" class="centered" attr-for-selected="tab" fallback-selection="basic">
+    <paper-tab tab="basic">Basic usage</paper-tab>
+    <paper-tab tab="filtering">Filtering</paper-tab>
+    <paper-tab tab="sorting">Sorting</paper-tab>
+    <paper-tab tab="details">Row details</paper-tab>
+    <paper-tab tab="scroll">Scroll</paper-tab>
+    <paper-tab tab="advanced">Advanced</paper-tab>
+  </paper-tabs>
+
+  <iron-pages id="pages" class="centered" attr-for-selected="tab" fallback-selection="basic">
+    <div tab="basic">
+      <h4>Basic usage</h4>
+      <demo-snippet>
+        <template>
+          <template is="dom-bind">
+            <iron-ajax auto url="users.json" last-response="{{users}}"></iron-ajax>
+
+            <brainy-table items="[[users.data]]">
+              <brainy-table-column name="First Name">
+                <template>[[item.user.name.first]]</template>
+              </brainy-table-column>
+              <brainy-table-column name="Last Name">
+                <template>[[item.user.name.last]]</template>
+              </brainy-table-column>
+              <brainy-table-column name="Email">
+                <template>[[item.user.email]]</template>
+              </brainy-table-column>
+            </brainy-table>
+          </template>
+        </template>
+      </demo-snippet>
+      <h4>Two-way binding support</h4>
+      <demo-snippet>
+        <template>
+          <template is="dom-bind">
+            <style is="custom-style">
+              :root {
+                --paper-input-container: {
+                  font-size: inherit;
+                }
+              }
+
+              .foo {
+                margin-bottom: 10px;
+              }
+            </style>
+            <iron-ajax auto url="users.json" last-response="{{users}}"></iron-ajax>
+
+            <paper-input class="foo" no-label-float label="Foo" value="{{foo}}"></paper-input>
+            <brainy-table items="[[users.data]]">
+              <brainy-table-column name="First Name">
+                <template>
+                  <paper-input no-label-float value="{{item.user.name.first}}"></paper-input>
+                </template>
+              </brainy-table-column>
+              <brainy-table-column name="First Name Also">
+                <template>[[item.user.name.first]]</template>
+              </brainy-table-column>
+              <brainy-table-column name="Foo">
+                <template>
+                  <paper-input no-label-float value="{{foo}}"></paper-input>
+                </template>
+              </brainy-table-column>
+            </brainy-table>
+          </template>
+        </template>
+      </demo-snippet>
+      <h4>Pagination</h4>
+      <demo-snippet>
+        <template>
+          <template is="dom-bind">
+            <iron-ajax auto url="users.json" last-response="{{users}}"></iron-ajax>
+
+            <brainy-table items="[[users.data]]" page-size="5">
+              <brainy-table-column name="First Name">
+                <template>[[item.user.name.first]]</template>
+              </brainy-table-column>
+              <brainy-table-column name="Last Name">
+                <template>[[item.user.name.last]]</template>
+              </brainy-table-column>
+              <brainy-table-column name="Email">
+                <template>[[item.user.email]]</template>
+              </brainy-table-column>
+            </brainy-table>
+          </template>
+        </template>
+      </demo-snippet>
+    </div>
+    <div tab="filtering">
+      <h4>Filtering</h4>
+      <demo-snippet>
+        <template>
+          <template is="dom-bind">
+            <iron-ajax auto url="users.json" last-response="{{users}}"></iron-ajax>
+
+            <brainy-table items="[[users.data]]">
+              <brainy-table-column name="Title">
+                <template>[[item.user.name.title]]</template>
+              </brainy-table-column>
+              <brainy-table-column name="First Name" filter-by="user.name.first">
+                <template>[[item.user.name.first]]</template>
+              </brainy-table-column>
+              <brainy-table-column name="Last Name">
+                <template>[[item.user.name.last]]</template>
+              </brainy-table-column>
+              <brainy-table-column name="Phone">
+                <template>[[item.user.phone]]</template>
+              </brainy-table-column>
+              <div no-results>No records found</div>
+            </brainy-table>
+          </template>
+        </template>
+      </demo-snippet>
+      <h4>Custom filter input</h4>
+      <demo-snippet>
+        <template>
+          <template is="dom-bind">
+            <style is="custom-style">
+              vaadin-combo-box {
+                --paper-input-container-label: {
+                  font-size: inherit;
+                }
+              }
+            </style>
+            <iron-ajax auto url="users.json" last-response="{{users}}"></iron-ajax>
+
+            <brainy-table items="[[users.data]]">
+              <brainy-table-column name="Title" filter-by="user.name.title">
+                <template is="header">
+                  <vaadin-combo-box
+                    label="[[column.name]]"
+                    value="{{column.filterValue}}"
+                    no-label-float
+                    allow-custom-value
+                  ></vaadin-combo-box>
+                </template>
+                <template>[[item.user.name.title]]</template>
+              </brainy-table-column>
+              <brainy-table-column name="First Name" filter-by="user.name.first">
+                <template>[[item.user.name.first]]</template>
+              </brainy-table-column>
+              <brainy-table-column name="Last Name">
+                <template>[[item.user.name.last]]</template>
+              </brainy-table-column>
+              <brainy-table-column name="Phone">
+                <template>[[item.user.phone]]</template>
+              </brainy-table-column>
+              <div no-results>No records found</div>
+            </brainy-table>
+          </template>
+        </template>
+      </demo-snippet>
+    </div>
+    <div tab="sorting">
+      <h4>Simple sorting with pre-configured default order</h4>
+      <demo-snippet>
+        <template>
+          <template is="dom-bind">
+            <iron-ajax auto url="users.json" last-response="{{users}}"></iron-ajax>
+            <brainy-table items="[[users.data]]" default-sort-path="user.name.last" default-sort-direction="desc">
+              <brainy-table-column name="First Name" filter-by="user.name.first" sort-by="user.name.first">
+                <template>[[item.user.name.first]]</template>
+              </brainy-table-column>
+              <brainy-table-column name="Last Name" sort-by="user.name.last" align-right>
+                <template>[[item.user.name.last]]</template>
+              </brainy-table-column>
+              <brainy-table-column name="Email">
+                <template>[[item.user.email]]</template>
+              </brainy-table-column>
+            </brainy-table>
+          </template>
+        </template>
+      </demo-snippet>
+      <h4>Case-sensitive string sorting (upper-case letters come first)</h4>
+      <demo-snippet>
+        <template>
+          <template is="dom-bind">
+            <iron-ajax auto url="users.json" last-response="{{users}}"></iron-ajax>
+
+            <brainy-table items="[[users.data]]" sort-case-sensitive>
+              <brainy-table-column name="First Name" filter-by="user.name.first" sort-by="user.name.first">
+                <template>[[item.user.name.first]]</template>
+              </brainy-table-column>
+              <brainy-table-column name="Last Name" sort-by="user.name.last" align-right>
+                <template>[[item.user.name.last]]</template>
+              </brainy-table-column>
+              <brainy-table-column name="Email">
+                <template>[[item.user.email]]</template>
+              </brainy-table-column>
+            </brainy-table>
+          </template>
+        </template>
+      </demo-snippet>
+    </div>
+    <div tab="details">
+      <h4>Row details</h4>
+      <demo-snippet>
+        <template>
+          <template is="dom-bind">
+            <style is="custom-style">
+              .expandable brainy-tr[expanded] {
+                margin: 10px 0;
+
+                @apply(--shadow-elevation-3dp);
+              }
+            </style>
+            <iron-ajax auto url="users.json" last-response="{{users}}"></iron-ajax>
+
+            <brainy-table class="expandable" items="[[users.data]]" details-enabled>
+              <brainy-table-column name="First Name">
+                <template>[[item.user.name.first]]</template>
+              </brainy-table-column>
+              <brainy-table-column name="Last Name">
+                <template>[[item.user.name.last]]</template>
+              </brainy-table-column>
+              <brainy-table-column name="Email">
+                <template>[[item.user.email]]</template>
+              </brainy-table-column>
+
+              <template is="row-detail">
+                <div>[[item.user.location.street]], [[item.user.location.city]], [[item.user.location.state]]</div>
+              </template>
+            </brainy-table>
+          </template>
+        </template>
+      </demo-snippet>
+      <h4>Styling expand indicator</h4>
+      <demo-snippet>
+        <template>
+          <template is="dom-bind">
+            <iron-ajax auto url="users.json" last-response="{{users}}"></iron-ajax>
+
+            <brainy-table items="[[users.data]]" details-enabled>
+              <brainy-table-column name="First Name">
+                <template>[[item.user.name.first]]</template>
+              </brainy-table-column>
+              <brainy-table-column name="Last Name">
+                <template>[[item.user.name.last]]</template>
+              </brainy-table-column>
+              <brainy-table-column name="Email">
+                <template>[[item.user.email]]</template>
+              </brainy-table-column>
+              <brainy-table-column name="" width="20px" align-right flex="0">
+                <template>
+                  <template is="dom-if" if="[[!expanded]]">
+                    <iron-icon icon="icons:expand-more"></iron-icon>
+                  </template>
+                  <template is="dom-if" if="[[expanded]]">
+                    <iron-icon icon="icons:expand-less"></iron-icon>
+                  </template>
+                </template>
+              </brainy-table-column>
+
+              <template is="row-detail">
+                <div>[[item.user.location.street]], [[item.user.location.city]], [[item.user.location.state]]</div>
+              </template>
+            </brainy-table>
+          </template>
+        </template>
+      </demo-snippet>
+      <h4>Custom expand toggle</h4>
+      <demo-snippet>
+        <template>
+          <template is="dom-bind">
+            <iron-ajax auto url="users.json" last-response="{{users}}"></iron-ajax>
+
+            <brainy-table items="[[users.data]]">
+              <brainy-table-column name="First Name">
+                <template>[[item.user.name.first]]</template>
+              </brainy-table-column>
+              <brainy-table-column name="Last Name">
+                <template>[[item.user.name.last]]</template>
+              </brainy-table-column>
+              <brainy-table-column name="Email">
+                <template>[[item.user.email]]</template>
+              </brainy-table-column>
+              <brainy-table-column flex="1" width="50px" align-right>
+                <template>
+                  <paper-checkbox checked="{{expanded}}">Details</paper-checkbox>
+                </template>
+              </brainy-table-column>
+
+              <template is="row-detail">
+                <div>[[item.user.location.street]], [[item.user.location.city]], [[item.user.location.state]]</div>
+              </template>
+            </brainy-table>
+          </template>
+        </template>
+      </demo-snippet>
+      <h4>Disable details for particular rows</h4>
+      <demo-snippet>
+        <style is="custom-style">
+          brainy-tr[detail-disabled] paper-checkbox {
+            opacity: 0.7;
+            pointer-events: none;
+          }
+        </style>
+        <template>
+          <template is="dom-bind">
+            <iron-ajax auto url="users.json" last-response="{{users}}"></iron-ajax>
+
+            <brainy-table id="demoDisabled" items="[[users.data]]">
+              <brainy-table-column name="First Name">
+                <template>[[item.user.name.first]]</template>
+              </brainy-table-column>
+              <brainy-table-column name="Last Name">
+                <template>[[item.user.name.last]]</template>
+              </brainy-table-column>
+              <brainy-table-column name="Email">
+                <template>[[item.user.email]]</template>
+              </brainy-table-column>
+              <brainy-table-column flex="1" width="50px" align-right>
+                <template>
+                  <paper-checkbox checked="{{expanded}}">Details</paper-checkbox>
+                </template>
+              </brainy-table-column>
+
+              <template is="row-detail">
+                <div>[[item.user.location.street]], [[item.user.location.city]], [[item.user.location.state]]</div>
+              </template>
+            </brainy-table>
+          </template>
+        </template>
+      </demo-snippet>
+    </div>
+    <div tab="scroll">
+      <h4>Full effects: drag and drop, shadows, custom scroll bar</h4>
+      <demo-snippet>
+        <template>
+          <template is="dom-bind">
+            <iron-ajax auto url="users.json" last-response="{{users}}"></iron-ajax>
+
+            <brainy-table items="[[users.data]]" drag-scrollable>
+              <brainy-table-column name="First Name" width="150px">
+                <template>[[item.user.name.first]]</template>
+              </brainy-table-column>
+              <brainy-table-column name="Last Name" width="150px">
+                <template>[[item.user.name.last]]</template>
+              </brainy-table-column>
+              <brainy-table-column name="Email" width="150px">
+                <template>[[item.user.email]]</template>
+              </brainy-table-column>
+              <brainy-table-column name="Username" width="150px">
+                <template>[[item.user.username]]</template>
+              </brainy-table-column>
+              <brainy-table-column name="Phone" width="150px">
+                <template>[[item.user.phone]]</template>
+              </brainy-table-column>
+            </brainy-table>
+          </template>
+        </template>
+      </demo-snippet>
+      <h4>No effects: just a native scroll</h4>
+      <demo-snippet>
+        <template>
+          <template is="dom-bind">
+            <iron-ajax auto url="users.json" last-response="{{users}}"></iron-ajax>
+
+            <brainy-table items="[[users.data]]" no-custom-scroll no-scroll-shadows>
+              <brainy-table-column name="First Name" width="150px">
+                <template>[[item.user.name.first]]</template>
+              </brainy-table-column>
+              <brainy-table-column name="Last Name" width="150px">
+                <template>[[item.user.name.last]]</template>
+              </brainy-table-column>
+              <brainy-table-column name="Email" width="150px">
+                <template>[[item.user.email]]</template>
+              </brainy-table-column>
+              <brainy-table-column name="Username" width="150px">
+                <template>[[item.user.username]]</template>
+              </brainy-table-column>
+              <brainy-table-column name="Phone" width="150px">
+                <template>[[item.user.phone]]</template>
+              </brainy-table-column>
+            </brainy-table>
+          </template>
+        </template>
+      </demo-snippet>
+    </div>
+    <div tab="advanced">
+      <h4>Loading indicator</h4>
+      <demo-snippet>
+        <template>
+          <template is="dom-bind">
+            <iron-ajax auto url="users.json" last-response="{{users}}"></iron-ajax>
+
+            <brainy-table items="[[users.data]]" page-size="5" loading>
+              <brainy-table-column name="First Name">
+                <template>[[item.user.name.first]]</template>
+              </brainy-table-column>
+              <brainy-table-column name="Last Name">
+                <template>[[item.user.name.last]]</template>
+              </brainy-table-column>
+              <brainy-table-column name="Email">
+                <template>[[item.user.email]]</template>
+              </brainy-table-column>
+            </brainy-table>
+          </template>
+        </template>
+      </demo-snippet>
+      <h4>Custom row sizes</h4>
+      <demo-snippet>
+        <template>
+          <template is="dom-bind">
+            <iron-ajax auto url="users.json" last-response="{{users}}"></iron-ajax>
+
+            <brainy-table items="[[users.data]]" page-size="5" row-min-height="28" header-height="40">
+              <brainy-table-column name="First Name">
+                <template>[[item.user.name.first]]</template>
+              </brainy-table-column>
+              <brainy-table-column name="Last Name">
+                <template>[[item.user.name.last]]</template>
+              </brainy-table-column>
+              <brainy-table-column name="Email">
+                <template>[[item.user.email]]</template>
+              </brainy-table-column>
+            </brainy-table>
+          </template>
+        </template>
+      </demo-snippet>
+      <h4>Toggle columns</h4>
+      <demo-snippet>
+        <template>
+          <template is="dom-bind">
+            <style is="custom-style">
+              .toggle {
+                margin-right: 10px;
+              }
+            </style>
+
+            <iron-ajax auto url="users.json" last-response="{{users}}"></iron-ajax>
+            <p>
+              <paper-checkbox checked="{{hideName}}" class="toggle">
+                <label>hide name</label>
+              </paper-checkbox>
+              <paper-checkbox checked="{{hidePhone}}" class="toggle">
+                <label>hide phone</label>
+              </paper-checkbox>
+              <paper-checkbox checked="{{hideEmail}}" class="toggle">
+                <label>hide email</label>
+              </paper-checkbox>
+            </p>
+
+            <brainy-table items="[[users.data]]">
+              <brainy-table-column name="First Name" hidden="[[hideName]]">
+                <template>[[item.user.name.first]]</template>
+              </brainy-table-column>
+              <brainy-table-column name="Last Name">
+                <template>[[item.user.name.last]]</template>
+              </brainy-table-column>
+              <brainy-table-column name="Phone" hidden="[[hidePhone]]">
+                <template>[[item.user.phone]]</template>
+              </brainy-table-column>
+              <brainy-table-column name="Email" width="200px" hidden="[[hideEmail]]">
+                <template>[[item.user.email]]</template>
+              </brainy-table-column>
+            </brainy-table>
+          </template>
+        </template>
+      </demo-snippet>
+    </div>
+  </iron-pages>
+
+  <script>
+    document.addEventListener('WebComponentsReady', function() {
+      document.querySelector('vaadin-combo-box').items = ['mr', 'ms', 'miss'];
+
+      var tabs = document.getElementById('tabs');
+
+      tabs.addEventListener('iron-select', function(e) {
+        document.getElementById('pages').select(e.detail.item.getAttribute('tab'));
+      });
+
+      var demoDisabled = document.getElementById('demoDisabled');
+      demoDisabled.shouldDisableDetailCallback = function(item) {
+        return item.user && item.user.private;
+      };
+    });
+  </script>
+</body>
+</html>

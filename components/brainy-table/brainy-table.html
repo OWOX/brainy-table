@@ -1,0 +1,887 @@
+<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../iron-icon/iron-icon.html">
+<link rel="import" href="../iron-resizable-behavior/iron-resizable-behavior.html">
+<link rel="import" href="../paper-icon-button/paper-icon-button.html">
+<link rel="import" href="../paper-spinner/paper-spinner-lite.html">
+
+<link rel="import" href="brainy-table-column.html">
+<link rel="import" href="brainy-table-data-source-behavior.html">
+<link rel="import" href="brainy-table-icons.html">
+<link rel="import" href="brainy-td.html">
+<link rel="import" href="brainy-th.html">
+<link rel="import" href="brainy-tr.html">
+<link rel="import" href="brainy-tr-detail.html">
+
+<!--
+`brainy-table` is a Polymer 1.x data table element.
+
+Inspired by [iron-data-table](https://github.com/Saulis/iron-data-table).
+Follows the guidelines of [Material Design](https://material.google.com/components/data-tables.html).
+
+### Features
+- Data filtering
+- Data sorting
+- Pagination
+- Template support for each column
+- Two-way binding support
+- Custom styling support for templates
+- Flex support for cells
+- Native Shadow DOM support
+- Column manipulation, resizing, hiding, reordering
+- Custom header templates
+- Row details
+- Disabling row details depending on item subproperty value
+- Horizontal scrolling shadows
+- "Drag-and-drop" scroll
+
+### Special use cases
+- Limited amount of data (for infinite scrolling, consider using `iron-data-table` instead)
+- Table shouldn't be explicitly sized (height depends on rows count)
+- Rows can include dropdown menus etc (no `transform` is used, so table does not create `z-index` trap)
+
+
+### Styling
+The following custom properties and mixins are available for styling:
+
+Custom property                          | Description                                      | Default
+-----------------------------------------|--------------------------------------------------|---------------
+`--brainy-table`                         | Mixin applied to the main element                | `{}`
+`--brainy-table-left-shadow-background`  | Left scrolling shadow background                 | `linear-gradient(to right, rgba(37, 37, 37, 0.3), transparent)`
+`--brainy-table-left-shadow-width`       | Left scrolling shadow width                      | `7px`
+`--brainy-table-right-shadow-background` | Right scrolling shadow background                | `linear-gradient(to right, transparent, rgba(37, 37, 37, 0.3))`
+`--brainy-table-right-shadow-width`      | Right scrolling shadow width                     | `7px`
+`--brainy-table-webkit-scrollbar-thumb`  | Mixin applied to the webkit scrollbar thumb      | `{}`
+`--brainy-table-webkit-scrollbar`        | Mixin applied to the webkit scrollbar            | `{}`
+`--brainy-tr`                            | Mixin applied to the row item element            | `{}`
+`--brainy-tr-even`                       | Mixin applied to even rows                       | `{}`
+`--brainy-tr-odd`                        | Mixin applied to odd rows                        | `{}`
+`--brainy-tr-hover`                      | Mixin applied to the row in hover state          | `{}`
+`--brainy-tr-focused`                    | Mixin applied to the row in focused state        | `{}`
+`--brainy-tr-after`                      | Mixin applied to ::after rows                    | `{}`
+`--brainy-tr-focused-after`              | Mixin applied to ::after focused rows            | `{}`
+`--brainy-table-no-results`              | Mixin applied to the "no results" container      | `{}`
+`--brainy-table-pager-disabled-color`    | Color of the disabled pagination button          | `#d3d3d3`
+
+@element brainy-table
+@demo demo/index.html
+-->
+
+<dom-module id="brainy-table">
+  <template>
+    <style>
+      :host {
+        display: block;
+        position: relative;
+        --paper-spinner-color: var(--primary-color, --google-blue-500);
+        --paper-icon-button-disabled-text: var(--brainy-table-pager-disabled-color, #d3d3d3);
+
+        @apply(--brainy-table);
+      }
+
+      :host #wrapper {
+        position: static;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+      }
+
+      :host #wrapper.left-shadow::before {
+        display: block;
+        content: "";
+        position: absolute;
+        width: var(--brainy-table-left-shadow-width, 7px);
+        top: 0;
+        left: 0;
+        bottom: 0;
+        background: var(--brainy-table-left-shadow-background, linear-gradient(to right, rgba(37, 37, 37, 0.3), transparent));
+      }
+
+      :host #wrapper.right-shadow::after {
+        display: block;
+        content: "";
+        position: absolute;
+        width: var(--brainy-table-right-shadow-width, 7px);
+        top: 0;
+        right: 0;
+        bottom: 0;
+        background: var(--brainy-table-right-shadow-background, linear-gradient(to right, transparent, rgba(37, 37, 37, 0.3)));
+      }
+
+      :host([has-pages]) #wrapper.left-shadow::before,
+      :host([has-pages]) #wrapper.right-shadow::after {
+        bottom: 56px;
+      }
+
+      :host([details-enabled]) ::content brainy-tr:not([header]):not([detail-disabled]):hover {
+        cursor: pointer;
+
+        @apply(--brainy-table-details-enabled-tr-hover);
+      }
+
+      :host(.draggable) ::content brainy-tr {
+        cursor: -webkit-grab;
+        cursor: -moz-grab;
+        cursor: grab;
+      }
+
+      :host(.dragging) ::content brainy-tr {
+        cursor: -webkit-grabbing;
+        cursor: -moz-grabbing;
+        cursor: grabbing;
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+      }
+
+      :host(:not([no-custom-scroll])) #wrapper::-webkit-scrollbar-thumb {
+        background: #a1a0a0;
+
+        @apply(--brainy-table-webkit-scrollbar-thumb);
+      }
+
+      :host(:not([no-custom-scroll])) #wrapper::-webkit-scrollbar {
+        width: 6px;
+        height: 6px;
+
+        @apply(--brainy-table-webkit-scrollbar);
+      }
+
+      .no-results {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #fff;
+        padding: 0 24px;
+        border: 1px solid #e3e3e3;
+        border-top: none;
+        font: 500 12px/1 Roboto, sans-serif;
+
+        @apply(--brainy-table-no-results);
+      }
+
+      .footer {
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        box-sizing: border-box;
+        padding: 8px 6px;
+        background: #fff;
+        color: rgba(0, 0, 0, 0.54);
+        font: 500 12px/1 Roboto, sans-serif;
+        border: 1px solid #e3e3e3;
+        border-top: none;
+      }
+
+      .footer-page {
+        display: inline-flex;
+        margin-right: 12px;
+        vertical-align: middle;
+      }
+
+      @media (max-width: 480px) {
+        .footer-page {
+          margin-right: 6px;
+        }
+
+        .footer-btn {
+          width: 30px;
+          height: 30px;
+          flex: 0 0 30px;
+          padding: 3px;
+        }
+      }
+
+      .spinner {
+        margin-right: 10px;
+      }
+    </style>
+
+    <div id="wrapper" on-scroll="_onHorizontalScroll">
+      <div id="header">
+        <brainy-tr header>
+          <template is="dom-repeat" items="[[columns]]" as="column">
+            <brainy-th
+              align-right="[[column.alignRight]]"
+              column="[[column]]"
+              flex="[[column.flex]]"
+              hidden="[[column.hidden]]"
+              order="[[column.order]]"
+              header-height="[[headerHeight]]"
+              table="[[_this]]"
+              template="[[column.headerTemplate]]"
+              width="[[column.width]]"
+              sort-by="[[column.sortBy]]"
+              current-sort-path="[[sortPath]]"
+              current-sort-direction="[[sortDirection]]"
+              default-sort-path="[[defaultSortPath]]"
+              no-reset-sort="[[noResetDefaultSort]]"
+              on-sort-direction-changed="_sortDirectionChanged"
+            >
+              <iron-icon
+                hidden$="[[!column.sortBy]]"
+                icon="brainy-table:arrow-upward"
+                sort-trigger
+              ></iron-icon>
+            </brainy-th>
+          </template>
+        </brainy-tr>
+      </div>
+
+      <div id="container">
+        <template id="rows" is="dom-repeat" items="[[_currentItems]]" initial-count="[[chunkSize]]" target-framerate="[[frameRate]]">
+          <div class="item">
+            <brainy-tr
+              even$="[[!_isEven(index)]]"
+              first$="[[_isFirst(index)]]"
+              last$="[[_isLast(index, items.length)]]"
+              expanded="[[_isExpanded(item, expandedItems, expandedItems.*)]]"
+              detail-disabled="[[_isDetailDisabled(item, shouldDisableDetailCallback)]]"
+              index="[[index]]"
+              item="[[item]]"
+              tabindex="-1"
+            >
+              <template is="dom-repeat" items="[[columns]]" as="column" index-as="colIndex">
+                <brainy-td
+                  template="[[column.template]]"
+                  table="[[_this]]"
+                  align-right="[[column.alignRight]]"
+                  row-min-height="[[rowMinHeight]]"
+                  column="[[column]]"
+                  expanded="[[_isExpanded(item, expandedItems, expandedItems.*)]]"
+                  flex="[[column.flex]]"
+                  hidden="[[column.hidden]]"
+                  index="[[index]]"
+                  item="[[item]]"
+                  on-click="_onCellClick"
+                  order="[[column.order]]"
+                  width="[[column.width]]"
+                ></brainy-td>
+              </template>
+              <template is="dom-if" if="[[_isExpanded(item, expandedItems)]]">
+                <brainy-tr-detail
+                  index="[[index]]"
+                  item="[[item]]"
+                  expanded="[[_isExpanded(item, expandedItems, expandedItems.*)]]"
+                  table="[[_this]]"
+                  template="[[_rowDetail]]"
+                ></brainy-tr-detail>
+              </template>
+            </brainy-tr>
+          </div>
+        </template>
+      </div>
+    </div>
+    <template is="dom-if" if="[[_computeNoResults(_currentItems.length, filter.length)]]">
+      <div class="no-results" style$="min-height: [[rowMinHeight]]px">
+        <content select="[no-results]"></content>
+      </div>
+    </template>
+    <template is="dom-if" if="[[_computeShowFooter(hasPages, _currentItems.length)]]">
+      <div class="footer" style$="height: [[headerHeight]]px">
+        <content select="[footer]"></content>
+        <template is="dom-if" if="[[loading]]">
+          <paper-spinner-lite class="spinner" active></paper-spinner-lite>
+        </template>
+        <span class="footer-page" hidden$="[[!size]]">
+          <span hidden$="[[_rangeStartHidden(_currentItems.length)]]">[[_getRangeStart(_currentPage, pageSize, size)]]-</span>
+          <span>[[_getRangeEnd(_currentPage, pageSize, size)]]</span>
+          <span>&nbsp;[[_computeOf(lang)]]&nbsp;[[size]]</span>
+        </span>
+        <paper-icon-button
+          icon="brainy-table:first-page"
+          on-tap="firstPage"
+          disabled="[[_prevPageDisabled(_currentPage, pageSize, size)]]"
+          class="footer-btn"
+        ></paper-icon-button>
+        <paper-icon-button
+          icon="brainy-table:prev-page"
+          on-tap="prevPage"
+          disabled="[[_prevPageDisabled(_currentPage, pageSize, size)]]"
+          class="footer-btn"
+        ></paper-icon-button>
+        <paper-icon-button
+          icon="brainy-table:next-page"
+          on-tap="nextPage"
+          disabled="[[_nextPageDisabled(_currentPage, pageSize, size)]]"
+          class="footer-btn"
+        ></paper-icon-button>
+        <paper-icon-button
+          icon="brainy-table:last-page"
+          on-tap="lastPage"
+          disabled="[[_nextPageDisabled(_currentPage, pageSize, size)]]"
+          class="footer-btn"
+        ></paper-icon-button>
+      </div>
+    </template>
+
+    <content select="brainy-table-column"></content>
+    <content select="template[is=row-detail]"></content>
+  </template>
+
+  <script>
+    (function() {
+      'use strict';
+
+      Polymer({
+        is: 'brainy-table',
+
+        behaviors: [
+          Polymer.IronResizableBehavior,
+          Brainy.TableDataSourceBehavior
+        ],
+
+        properties: {
+
+          /**
+           * Exposes the "initial-count" property of rows template.
+           * See dom-repeat docs for details
+           */
+          chunkSize: {
+            type: Number
+          },
+
+          /**
+           * Exposes the "targetFramerate" property of rows template.
+           * See dom-repeat docs for details
+           */
+          frameRate: {
+            type: Number,
+            value: 20
+          },
+
+          /**
+           * An height of the table header and footer.
+           */
+          headerHeight: {
+            type: Number,
+            value: 56,
+            notify: true
+          },
+
+          /**
+           * An min-height of the table rows.
+           */
+          rowMinHeight: {
+            type: Number,
+            value: 48,
+            notify: true
+          },
+
+          /**
+           * If `true`, tapping a row will expand the item details, if available.
+           */
+          detailsEnabled: {
+            type: Boolean,
+            reflectToAttribute: true,
+            value: false
+          },
+
+          /**
+           * If `true`, enables scrolling via holding the mouse button ("drag and drop" or "click and hold" style).
+           */
+          dragScrollable: {
+            type: Boolean,
+            observer: '_dragScrollableChanged',
+            value: false
+          },
+
+          /**
+           * An array containing path/filter value pairs that are used to filter the items.
+           */
+          filter: {
+            type: Array,
+            notify: true,
+            value: function() {
+              return [];
+            }
+          },
+
+          /**
+           * If `true`, the spinner will be shown in the footer. Set this if you use batches to load data.
+           */
+          loading: {
+            type: Boolean
+          },
+
+          /**
+           * If `true`, string comparision when sorting will be case sensitive.
+           * Otherwise, both strings will be converted to lower case when comparing.
+           */
+          sortCaseSensitive: {
+            type: Boolean,
+            value: false
+          },
+
+          /**
+           * A string indicating property used to sort by default.
+           * Must be used together with `defaultSortDirection`.
+           */
+          defaultSortPath: {
+            type: String
+          },
+
+          /**
+           * A string indicating sort direction used by default.
+           * Must be used together with `defaultSortPath`.
+           */
+          defaultSortDirection: {
+            type: String
+          },
+
+          /**
+           * A string indicating property used to sort.
+           */
+          sortPath: {
+            type: String,
+            value: null,
+            notify: true
+          },
+
+          /**
+           * A string indicating sort direction.
+           */
+          sortDirection: {
+            type: String,
+            value: null,
+            notify: true
+          },
+
+          /**
+           * By default, if you specified both `defaultSortPath` and `defaultSortDirection`,
+           * these settings will be re-set when cancelling sorting by other column.
+           * So, the table will always be sorted and sort icon will shown to users.
+           * This makes sense if you get already sorted data from the API request.
+           *
+           * Set this to `true`, if you want to discard this behavior and set `sortDirection` to null.
+           * The only difference here is that sort icon will be hidden after cancelling sorting.
+           */
+          noResetDefaultSort: {
+            type: Boolean
+          },
+
+          /**
+           * Allows to pass a function, which will be applied for item
+           * to test if row detail should be expanded.
+           *
+           * Declare it in your container element like this:
+           * ```
+           * properties: {
+           *   callback: {
+           *     type: Object,
+           *     value: function() {
+           *       return function (item) {
+           *         return item.type === 'private';
+           *       };
+           *     }
+           *   }
+           * }
+           * ```
+           *
+           * And then pass it like this:
+           * ```
+           * <brainy-table items="[[items]]" should-disable-detail-callback="[[callback]]">
+           * ```
+           */
+          shouldDisableDetailCallback: {
+            type: Function,
+            value: null
+          },
+
+          /**
+           * An array of `brainy-table-column` elements which contain the templates.
+           * to be stamped with items.
+           */
+          columns: {
+            type: Array,
+            notify: true,
+            observer: '_columnsChanged',
+            value: function() {
+              return [];
+            }
+          },
+
+          /**
+           * An array containing items with expanded row details.
+           */
+          expandedItems: {
+            type: Array,
+            notify: true,
+            value: function() {
+              return [];
+            }
+          },
+
+          /**
+           * A lang for pagination counter l10n.
+           */
+          lang: {
+            type: String,
+            value: 'en'
+          },
+
+          /**
+           * If `true`, custom webkit scroll bar styling will be disabled.
+           */
+          noCustomScroll: {
+            type: Boolean,
+            reflectToAttribute: true,
+            value: false
+          },
+
+          /**
+           * If `true`, no horizontal scroll shadows will appear.
+           */
+          noScrollShadows: {
+            type: Boolean,
+            value: false
+          },
+
+          _rowDetail: Object,
+
+          _this: {
+            type: Object,
+            value: function() {
+              return this;
+            }
+          }
+        },
+
+        listeners: {
+          'column-filter-changed': '_onColumnFilterChanged',
+          'column-hidden-changed': '_onColumnHiddenChanged',
+          'item-changed': '_itemChanged',
+          'iron-resize': '_onResize'
+        },
+
+        observers: [
+          '_defaultSortChanged(defaultSortPath, defaultSortDirection)'
+        ],
+
+        created: function() {
+          this._observer = Polymer.dom(this).observeNodes(function(info) {
+            var hasColumns = function(node) {
+              return (node.nodeType === Node.ELEMENT_NODE && node.tagName.toUpperCase() === 'BRAINY-TABLE-COLUMN');
+            };
+
+            var hasDetails = function(node) {
+              return (
+                node.nodeType === Node.ELEMENT_NODE &&
+                node.tagName.toUpperCase() === 'TEMPLATE' &&
+                node.hasAttribute('is') &&
+                node.getAttribute('is') === 'row-detail'
+              );
+            };
+
+            if (info.addedNodes.filter(hasColumns).length > 0 || info.removedNodes.filter(hasColumns).length > 0) {
+              this.set('columns', this.getContentChildren('[select=brainy-table-column]'));
+              this.notifyResize();
+            }
+
+            if (info.addedNodes.filter(hasDetails).length > 0) {
+              this.set('_rowDetail', this.getContentChildren('[select="template[is=row-detail]"]')[0]);
+
+              // assuming parent element is always a Polymer element.
+              // set dataHost to the same context the template was declared in
+              var parent = Polymer.dom(this._rowDetail).parentNode;
+              this._rowDetail._rootDataHost = parent.dataHost ?
+                (parent.dataHost._rootDataHost || parent.dataHost) : parent;
+            }
+          }.bind(this));
+        },
+
+        _forceResize: function() {
+          Polymer.RenderStatus.afterNextRender(this.$.rows, function() {
+            this.notifyResize();
+            this.fire('table-resize');
+          }.bind(this));
+        },
+
+        _dragScrollableChanged: function(dragScrollable, oldDragScrollable) {
+          var wrapper = this.$.wrapper;
+          if (dragScrollable) {
+            this.listen(wrapper, 'mousedown', '_startDragging');
+            this.listen(wrapper, 'mouseup', '_stopDragging');
+            this.listen(wrapper, 'mousemove', '_processDragging');
+            this.listen(wrapper, 'mouseleave', '_cancelDragging');
+            this.listen(wrapper, 'selectstart', '_preventSelectOnDrag');
+          } else if (!dragScrollable && oldDragScrollable) {
+            this.unlisten(wrapper, 'mousedown', '_startDragging');
+            this.unlisten(wrapper, 'mouseup', '_stopDragging');
+            this.unlisten(wrapper, 'mousemove', '_processDragging');
+            this.unlisten(wrapper, 'mouseleave', '_cancelDragging');
+            this.unlisten(wrapper, 'selectstart', '_preventSelectOnDrag');
+          }
+        },
+
+        _startDragging: function(e) {
+          var wrapper = this.$.wrapper;
+          if (wrapper.clientWidth < wrapper.scrollWidth) {
+            wrapper.dataset.lastClientX = e.clientX;
+            this.toggleClass('dragging', true);
+          }
+        },
+
+        _stopDragging: function(e) {
+          var wrapper = this.$.wrapper;
+          if (wrapper.clientWidth < wrapper.scrollWidth) {
+            wrapper.dataset.lastClientX = e.clientX;
+            this.toggleClass('dragging', false);
+          }
+        },
+
+        _cancelDragging: function() {
+          this.toggleClass('dragging', false);
+        },
+
+        _processDragging: function(e) {
+          var wrapper = this.$.wrapper;
+          if (this.classList.contains('dragging')) {
+            this.debounce('drag', function() {
+              var oldX = wrapper.dataset.lastClientX;
+              var diff = oldX - e.clientX;
+              wrapper.dataset.lastClientX = e.clientX;
+              wrapper.scrollLeft += diff;
+            }, 1);
+          }
+        },
+
+        _preventSelectOnDrag: function(e) {
+          // fix cursor appearance in Safari
+          if (this.classList.contains('dragging')) {
+            e.preventDefault();
+          }
+        },
+
+        _stopPropagation: function(e) {
+          e.stopImmediatePropagation();
+        },
+
+        _isEven: function(index) {
+          return index % 2 === 0;
+        },
+
+        _isFirst: function(index) {
+          return index === 0;
+        },
+
+        _isLast: function(index, length) {
+          return length - index === 1;
+        },
+
+        _computeOf: function(lang) {
+          switch (lang) {
+            case 'ru':
+              return 'из';
+            default:
+              return 'of';
+          }
+        },
+
+        _computeShowFooter: function(hasPages, count) {
+          return hasPages && count;
+        },
+
+        _computeNoResults: function(itemsCount, filterCount) {
+          return filterCount && itemsCount === 0;
+        },
+
+        _checkScroll: function() {
+          var wrapper = this.$.wrapper;
+          var width = wrapper.scrollLeft ? wrapper.scrollWidth : wrapper.clientWidth;
+          if (width > 0) {
+            this.$.header.style.width = width + 'px';
+            this.$.container.style.width = width + 'px';
+          }
+          if (!this.noScrollShadows) {
+            this.toggleClass('left-shadow', wrapper.scrollLeft > 0, wrapper);
+            this.toggleClass('right-shadow', wrapper.scrollLeft + wrapper.clientWidth < wrapper.scrollWidth, wrapper);
+          }
+          if (this.dragScrollable) {
+            this.toggleClass('draggable', wrapper.clientWidth < wrapper.scrollWidth);
+          }
+        },
+
+        _updateCells: function() {
+          Polymer.dom.flush();
+          this.queryAllEffectiveChildren('brainy-tr').forEach(function(row) {
+            row.updateCells();
+          });
+        },
+
+        _onResize: function() {
+          this.async(this._checkScroll);
+        },
+
+        _onHorizontalScroll: function() {
+          this.debounce('scrolling', this._checkScroll);
+        },
+
+        _defaultSortChanged: function(defaultPath, defaultDirection) {
+          // only respect those properties once
+          if (defaultPath && defaultDirection && !this._sortInitialized) {
+            this._sortInitialized = true;
+            this.sortDirection = defaultDirection;
+            this.sortPath = defaultPath;
+          }
+        },
+
+        _sortDirectionChanged: function(e) {
+          this.sortPath = e.detail.path;
+          if (e.detail.direction) {
+            this.sortDirection = e.detail.direction;
+          } else if (this.defaultSortDirection && this.defaultSortPath && !this.noResetDefaultSort) {
+            this.sortPath = this.defaultSortPath;
+            this.sortDirection = this.defaultSortDirection;
+          } else {
+            this.sortDirection = null;
+          }
+        },
+
+        _columnsChanged: function(columns, oldColumns) {
+          if (oldColumns) {
+            oldColumns.forEach(function(column) {
+              this.unlisten(column, 'filter-value-changed');
+            }.bind(this));
+          }
+
+          if (columns) {
+            columns.forEach(function(column) {
+              column.table = this;
+              this.listen(column, 'filter-value-changed', '_onColumnFilterChanged');
+            }.bind(this));
+          }
+
+          this.async(this._updateCells);
+        },
+
+        _onColumnFilterChanged: function(e) {
+          for (var i = 0; i < this.filter.length; i++) {
+            if (this.filter[i].path === e.detail.filterBy) {
+              this.set('filter.' + i + '.filter', e.detail.value);
+              return;
+            }
+          }
+
+          this.push('filter', {
+            path: e.detail.filterBy,
+            filter: e.detail.value
+          });
+        },
+
+        _onColumnHiddenChanged: function() {
+          this._updateCells();
+        },
+
+        _itemChanged: function(e) {
+          if (this.items) {
+            var index = this.items.indexOf(e.detail.item);
+            if (index >= 0) {
+              this.set('items.' + index + '.' + e.detail.path, e.detail.value);
+            }
+          }
+        },
+
+        /**
+         * Expands the row details for this item, if available.
+         * @param {Object} item - An item to expand
+         */
+        expandItem: function(item) {
+          var expanded = this.expandedItems;
+          if (this._rowDetail && expanded && !this._isExpanded(item, expanded) && !this._isDetailDisabled(item)) {
+            // replacing the whole array here to simplify the observers.
+            expanded.push(item);
+            this.expandedItems = expanded.slice(0);
+          }
+        },
+
+        /**
+         * Collapses the row details for this item, if expanded.
+         * @param {Object} item - An item to expand
+         */
+        collapseItem: function(item) {
+          var expanded = this.expandedItems;
+          if (this._rowDetail && expanded && this._isExpanded(item, expanded) && !this._isDetailDisabled(item)) {
+            var index = expanded.indexOf(item);
+
+            // replacing the whole array here to simplify the observers.
+            expanded.splice(index, 1);
+            this.expandedItems = expanded.slice(0);
+          }
+        },
+
+        /**
+         * Forces table to render rows synchronously.
+         */
+        render: function() {
+          this.$.rows.render();
+          this.fire('table-rendered');
+        },
+
+        _isExpanded: function(item, items) {
+          return items && items.indexOf(item) > -1;
+        },
+
+        _isDetailDisabled: function(item, cb) {
+          cb = cb || this.shouldDisableDetailCallback;
+          return cb ? cb(item) : null;
+        },
+
+        _isFocusable: function(target) {
+          var result;
+          if (Polymer.Settings.useNativeShadow) {
+            // https://nemisj.com/focusable/
+            // tabIndex is not reliable in IE.
+            result = target.tabIndex >= 0;
+          } else {
+            // unreliable with Shadow, document.activeElement doesn't go inside
+            // the shadow root.
+            result = target.contains(Polymer.dom(document.activeElement).node) || target.tagName.toUpperCase() === 'A';
+          }
+          return result;
+        },
+
+        /**
+         * Fired when user clicks on a item to expand it.
+         *
+         * @event expanding-item
+         * @param {Object} detail
+         * @param {Object} detail.item item to be expanded
+         */
+
+        /**
+         * Fired when user clicks on a item to collapse it.
+         *
+         * @event collapsing-item
+         * @param {Object} detail
+         * @param {Object} detail.item item to be collapsed
+         */
+
+        // we need to listen to click instead of tap because on mobile safari, the
+        // document.activeElement has not been updated (focus has not been shifted)
+        // yet at the point when tap event is being executed.
+        _onCellClick: function(e) {
+          // Prevent row expanding if row itself is not focused. This means that an element inside the row has been focused.
+          // Mobile devices don't move focus from body unless it's an input element that is focused, so this element will never get focused.
+          var target = e.model.item;
+          if (this._isFocusable(Polymer.dom(e).localTarget) === false) {
+            var fireEvent = function(eventName, item, defaultAction) {
+              var e = this.fire(eventName, {item: item}, {cancelable: true});
+              if (!e.defaultPrevented) {
+                defaultAction.call(this, item);
+              }
+            }.bind(this);
+            if (this._rowDetail && this.detailsEnabled && !this._isDetailDisabled(target)) {
+              if (this._isExpanded(target, this.expandedItems)) {
+                fireEvent('collapsing-item', target, this.collapseItem);
+              } else {
+                fireEvent('expanding-item', target, this.expandItem);
+              }
+            }
+          } else {
+            return;
+          }
+        }
+      });
+    })();
+  </script>
+</dom-module>

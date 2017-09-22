@@ -1,0 +1,121 @@
+<dom-module id="brainy-tr">
+  <template>
+    <style>
+      :host {
+        box-sizing: border-box;
+        display: flex;
+        flex-direction: column;
+        background: #fff;
+        margin-top: -1px;
+        border-top: 1px solid #e3e3e3;
+        border-bottom: 1px solid #e3e3e3;
+
+        @apply(--brainy-tr);
+      }
+
+      :host([header]) {
+        margin: 0;
+      }
+
+      :host(:not([header])[even]) {
+        @apply(--brainy-tr-even);
+      }
+
+      :host(:not([header]):not([even])) {
+        @apply(--brainy-tr-odd);
+      }
+
+      :host(:focus) {
+        outline: none;
+
+        @apply(--brainy-tr-focused);
+      }
+
+      :host(:not([header]):hover) {
+        background: #eee;
+
+        @apply(--brainy-tr-hover);
+      }
+
+      :host(:focus)::after {
+        @apply(--brainy-tr-focused-after);
+      }
+
+      :host::after {
+        @apply(--brainy-tr-after);
+      }
+
+      .cells {
+        display: flex;
+        flex-direction: row;
+        width: 100%;
+      }
+    </style>
+    <div class="cells">
+      <content select="brainy-td,brainy-th"></content>
+    </div>
+    <div class="details">
+      <content select="brainy-tr-detail"></content>
+    </div>
+  </template>
+  <script>
+    (function() {
+      'use strict';
+
+      Polymer({
+        is: 'brainy-tr',
+
+        properties: {
+          detailDisabled: {
+            type: Boolean,
+            reflectToAttribute: true
+          },
+          expanded: {
+            type: Boolean,
+            reflectToAttribute: true
+          },
+          index: Number,
+          item: Object,
+          _static: {
+            type: Object,
+            value: {
+              id: 0
+            }
+          }
+        },
+
+        attached: function() {
+          if (this.domHost && this.domHost.tagName.toUpperCase() === 'BRAINY-TABLE') {
+            var id = this._static.id++;
+
+            var item = this.parentElement;
+            if (!item._rowId) {
+              this._contentElement = document.createElement('content');
+              this._contentElement.setAttribute('select', '#item' + id);
+              Polymer.dom(item).appendChild(this._contentElement);
+              this.id = 'item' + id;
+              item._rowId = id;
+
+              Polymer.dom(this.domHost).appendChild(this);
+              // reset the cached value for shady root owner to make this.domHost
+              // return correct value.
+              this._ownerShadyRoot = undefined;
+            }
+          }
+        },
+
+        updateCells: function() {
+          var cells = this.queryAllEffectiveChildren('brainy-td,brainy-th');
+          cells.filter(function(cell) {
+            return !cell.hidden;
+          }).sort(function(a, b) {
+            return a.column.order - b.column.order;
+          }).forEach(function(cell, cellIndex, children) {
+            cell.toggleAttribute('is-first', cellIndex === 0);
+            cell.toggleAttribute('is-last', cellIndex === children.length - 1);
+          });
+        }
+      });
+    })();
+  </script>
+</dom-module>

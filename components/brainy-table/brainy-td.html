@@ -1,0 +1,29 @@
+<link rel="import" href="brainy-table-cell-behavior.html">
+<link rel="import" href="brainy-table-cell-shared-styles.html">
+
+<dom-module id="brainy-td">
+  <template>
+    <style include="brainy-table-cell-shared-styles">
+      :host {
+        font: 400 13px/1.1 Roboto, sans-serif;
+        color: rgba(0, 0, 0, 0.87);
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+      }
+    </style>
+    <content></content>
+  </template>
+  <script>
+    (function() {
+      'use strict';
+
+      Polymer({
+        is: 'brainy-td',
+
+        behaviors: [
+          Brainy.TableCellBehavior
+        ]
+      });
+    })();
+  </script>
+</dom-module>

@@ -1,0 +1,91 @@
+<link rel="import" href="brainy-table-templatizer-behavior.html">
+<script>
+  var Brainy = window.Brainy || {};
+
+  /**
+   * A behavior implemented by cells instances.
+   *
+   * @polymerBehavior Brainy.TableCellBehaviorImpl
+   */
+  Brainy.TableCellBehaviorImpl = {
+    properties: {
+      alignRight: {
+        type: Boolean,
+        reflectToAttribute: true
+      },
+      column: Object,
+      flex: Number,
+      hidden: Boolean,
+      order: Number,
+      rowMinHeight: Number,
+      template: Object,
+      width: String
+    },
+
+    observers: [
+      '_alignRightChanged(alignRight)',
+      '_columnChanged(_instance, column)',
+      '_columnPathChanged(_instance, column.*)',
+      '_flexChanged(flex)',
+      '_hiddenChanged(hidden)',
+      '_orderChanged(order)',
+      '_rowMinHeightChanged(rowMinHeight)',
+      '_widthChanged(width)'
+    ],
+
+    attached: function() {
+      if (!Polymer.Settings.useNativeShadow) {
+        // cell is supposed to be placed outside the local dom of brainy-table.
+        Polymer.StyleTransformer.dom(this, 'brainy-table', this._scopeCssViaAttr, true);
+        if (this.domHost) {
+          Polymer.StyleTransformer.dom(this, this.domHost.tagName.toLowerCase(), this._scopeCssViaAttr, false);
+        }
+      }
+    },
+
+    _alignRightChanged: function(alignRight) {
+      this.style.justifyContent = alignRight ? 'flex-end' : 'flex-start';
+    },
+
+    _hiddenChanged: function(hidden) {
+      this.toggleAttribute('hidden', hidden);
+    },
+
+    _orderChanged: function(order) {
+      this.style.order = order;
+    },
+
+    _flexChanged: function(flex) {
+      this.style.flexGrow = flex;
+    },
+
+    _rowMinHeightChanged: function(rowMinHeight) {
+      this.style.minHeight = Number(rowMinHeight) + 'px';
+    },
+
+    _widthChanged: function(width) {
+      this.style.flexBasis = width;
+    },
+
+    _columnChanged: function(instance, column) {
+      instance.column = column;
+    },
+
+    _columnPathChanged: function(instance, column) {
+      // sometimes instance isn't ready to be notified yet and throws an error.
+      this.async(function() {
+        // TODO: hack to avoid: https://github.com/Polymer/polymer/issues/3307
+        this._parentProps = this._parentProps || {};
+        instance.notifyPath(column.path, column.value);
+      });
+    }
+  };
+
+  /**
+   * @polymerBehavior
+   */
+  Brainy.TableCellBehavior = [
+    Brainy.TableTemplatizerBehavior,
+    Brainy.TableCellBehaviorImpl
+  ];
+</script>
