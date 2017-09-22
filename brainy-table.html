@@ -548,6 +548,7 @@ Custom property                          | Description                          
 
         listeners: {
           'column-filter-changed': '_onColumnFilterChanged',
+          'column-hidden-changed': '_onColumnHiddenChanged',
           'item-changed': '_itemChanged',
           'iron-resize': '_onResize'
         },
@@ -700,6 +701,12 @@ Custom property                          | Description                          
           }
         },
 
+        _updateCells: function() {
+          this.queryAllEffectiveChildren('brainy-tr').forEach(function(row) {
+            row.updateCells();
+          });
+        },
+
         _onResize: function() {
           this.async(this._checkScroll);
         },
@@ -742,6 +749,10 @@ Custom property                          | Description                          
               this.listen(column, 'filter-value-changed', '_onColumnFilterChanged');
             }.bind(this));
           }
+
+          Polymer.dom.flush();
+
+          this._updateCells();
         },
 
         _onColumnFilterChanged: function(e) {
@@ -756,6 +767,10 @@ Custom property                          | Description                          
             path: e.detail.filterBy,
             filter: e.detail.value
           });
+        },
+
+        _onColumnHiddenChanged: function() {
+          this._updateCells();
         },
 
         _itemChanged: function(e) {

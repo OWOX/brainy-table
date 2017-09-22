@@ -178,6 +178,9 @@
 
         _hiddenChanged: function(table, hidden) {
           this._notifyTable(table, 'hidden', hidden);
+          this.fire('column-hidden-changed', {
+            value: hidden
+          });
         },
 
         _orderChanged: function(table, order) {

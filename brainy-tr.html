@@ -102,6 +102,18 @@
               this._ownerShadyRoot = undefined;
             }
           }
+        },
+
+        updateCells: function() {
+          var cells = this.queryAllEffectiveChildren('brainy-td,brainy-th');
+          cells.filter(function(cell) {
+            return !cell.hidden;
+          }).sort(function(a, b) {
+            return a.column.order - b.column.order;
+          }).forEach(function(cell, cellIndex, children) {
+            cell.toggleAttribute('is-first', cellIndex === 0);
+            cell.toggleAttribute('is-last', cellIndex === children.length - 1);
+          });
         }
       });
     })();
