@@ -1,5 +1,8 @@
 # Change Log
 
+## [1.9.1] - 2017-10-11
+- Fix table borders not updating on page size change
+
 ## [1.9.0] - 2017-09-22
 - Refactor hiding columns to update table borders properly
 
