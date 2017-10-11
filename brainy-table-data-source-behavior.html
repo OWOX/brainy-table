@@ -191,6 +191,7 @@
         }
         this.set('_currentItems', items.slice(0));
         this._forceResize();
+        this._updateCells();
       }.bind(this);
       dataSource({
         page: page,
@@ -208,7 +209,6 @@
       // Force reload currently visible page
       if (typeof this._dataSource !== 'undefined') {
         this._loadPage(this._dataSource, this._currentPage);
-        this._updateCells();
       }
     },
 
