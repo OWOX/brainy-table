@@ -557,7 +557,7 @@ Custom property                          | Description                          
           '_defaultSortChanged(defaultSortPath, defaultSortDirection)'
         ],
 
-        created: function() {
+        attached: function() {
           this._observer = Polymer.dom(this).observeNodes(function(info) {
             var hasColumns = function(node) {
               return (node.nodeType === Node.ELEMENT_NODE && node.tagName.toUpperCase() === 'BRAINY-TABLE-COLUMN');
