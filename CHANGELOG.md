@@ -1,5 +1,11 @@
 # Change Log
 
+## [1.9.3] - 2018-04-19
+- Add onclick event to table row
+
+## [1.9.2] - 2017-12-29
+- Fix two tables bug in one page
+
 ## [1.9.1] - 2017-10-11
 - Fix table borders not updating on page size change
 
