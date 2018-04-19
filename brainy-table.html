@@ -239,6 +239,7 @@ Custom property                          | Description                          
               index="[[index]]"
               item="[[item]]"
               tabindex="-1"
+              on-click="_onRowClick"
             >
               <template is="dom-repeat" items="[[columns]]" as="column" index-as="colIndex">
                 <brainy-td
@@ -880,6 +881,17 @@ Custom property                          | Description                          
           } else {
             return;
           }
+        },
+        /**
+         * Fired when user clicks on a item.
+         *
+         * @event row-click
+         * @param {Object} detail
+         * @param {Object} detail.item item to be clicked
+         */
+        _onRowClick: function(e) {
+          var item = e.model.item;
+          this.fire('row-click', {item: item});
         }
       });
     })();
