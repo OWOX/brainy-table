@@ -1,5 +1,8 @@
 # Change Log
 
+## [1.9.4] - 2018-04-19
+- Fix lint issues 
+
 ## [1.9.3] - 2018-04-19
 - Add onclick event to table row
 
